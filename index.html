@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trion · Vision</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #f5f5f7;
+            --container-bg: #ffffff;
+            --surface: #f0f0f2;
+            --accent-primary: #6b7280;
+            --accent-secondary: #9ca3af;
+            --user-msg: #e5e5e5;
+            --ai-msg-bg: #fafafa;
+            --text-main: #1f2937;
+            --text-dim: #6b7280;
+            --border-light: #e0e0e0;
+            --gradient-gem: linear-gradient(135deg, #6b7280, #9ca3af);
+            --shadow-elevation: 0 20px 40px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.02) inset;
+            --neon-glow: 0 0 10px rgba(107, 114, 128, 0.3), 0 0 20px rgba(156, 163, 175, 0.2);
+            --neon-text: #4b5563;
+            --neon-border: #d1d5db;
+            --voice-active: #10b981;
+            --voice-inactive: #6b7280;
+            --call-active: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 12px;
+            background-image: radial-gradient(circle at 25% 0%, rgba(107, 114, 128, 0.05) 0%, transparent 40%),
+                              radial-gradient(circle at 75% 100%, rgba(156, 163, 175, 0.05) 0%, transparent 45%);
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 880px;
+            height: 94vh;
+            background: var(--container-bg);
+            border-radius: 32px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-elevation);
+            backdrop-filter: blur(2px);
+            border: 1px solid var(--border-light);
+        }
+
+        header {
+            padding: 18px 28px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 1.7rem;
+            font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--neon-text);
+            text-shadow: var(--neon-glow);
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        #status {
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: rgba(107, 114, 128, 0.1);
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: var(--neon-text);
+            letter-spacing: 0.2px;
+            border: 1px solid var(--neon-border);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #status i {
+            font-size: 0.6rem;
+            color: #9ca3af;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(240, 240, 242, 0.7);
+            padding: 5px 14px;
+            border-radius: 40px;
+            border: 1px solid var(--neon-border);
+            backdrop-filter: blur(4px);
+        }
+
+        .toggle-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--neon-text);
+            letter-spacing: 0.3px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            transition: .3s;
+            border-radius: 34px;
+            box-shadow: var(--neon-glow);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #6b7280;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(90deg, #6b7280, #9ca3af);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            background-color: #ffffff;
+        }
+
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--neon-text);
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid var(--neon-border);
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(8px);
+            box-shadow: var(--neon-glow);
+        }
+
+        .btn-clear:hover {
+            background: #e5e5e5;
+            border-color: #6b7280;
+            color: #1f2937;
+            transform: scale(1.02);
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 28px 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            scroll-behavior: smooth;
+            background: radial-gradient(ellipse at 30% 30%, rgba(107, 114, 128, 0.02) 0%, transparent 50%);
+        }
+
+        .chat-box::-webkit-scrollbar { width: 5px; }
+        .chat-box::-webkit-scrollbar-track { background: transparent; }
+        .chat-box::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 20px; }
+
+        .message {
+            max-width: 78%;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            padding: 16px 22px;
+            border-radius: 26px;
+            position: relative;
+            font-weight: 400;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            animation: fadeInUp 0.25s ease;
+            word-wrap: break-word;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user {
+            align-self: flex-end;
+            background: var(--user-msg);
+            color: var(--text-main);
+            border-bottom-right-radius: 6px;
+            border: 1px solid var(--border-light);
+        }
+
+        .ai {
+            align-self: flex-start;
+            background: var(--ai-msg-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-main);
+            border-bottom-left-radius: 6px;
+            backdrop-filter: blur(4px);
+            box-shadow: var(--neon-glow);
+        }
+
+        .ai::before {
+            content: 'Trion';
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--neon-text);
+            text-shadow: var(--neon-glow);
+            margin-bottom: 6px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .message-image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 16px;
+            margin-top: 10px;
+            border: 2px solid var(--neon-border);
+            object-fit: cover;
+        }
+
+        .thinking-dots {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .thinking-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--neon-text);
+            border-radius: 50%;
+            animation: pulse 1.2s infinite;
+        }
+        .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0%, 60%, 100% { opacity: 0.3; transform: scale(1); } 30% { opacity: 1; transform: scale(1.3); } }
+
+        .input-area {
+            padding: 20px 28px 24px 28px;
+            display: flex;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border-light);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-width: 200px;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 18px;
+            color: var(--neon-text);
+            font-size: 1rem;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 24px 16px 48px;
+            border-radius: 60px;
+            border: 1px solid var(--neon-border);
+            background: #fafafa;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s;
+            font-size: 1rem;
+            font-weight: 400;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        input:focus {
+            border-color: var(--neon-text);
+            box-shadow: var(--neon-glow), 0 2px 12px rgba(0,0,0,0.05);
+            background: #ffffff;
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+            font-size: 0.95rem;
+        }
+
+        .attach-btn {
+            background: transparent;
+            border: 1px solid var(--neon-border);
+            border-radius: 40px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.3rem;
+            box-shadow: var(--neon-glow);
+        }
+
+        .attach-btn:hover {
+            background: rgba(107, 114, 128, 0.1);
+            border-color: var(--neon-text);
+            color: var(--neon-text);
+            transform: scale(1.02);
+        }
+
+        .attach-btn input {
+            display: none;
+        }
+
+        /* Botón de llamada continua */
+        .call-btn {
+            background: transparent;
+            border: 2px solid var(--neon-border);
+            border-radius: 40px;
+            padding: 0 20px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--neon-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--neon-glow);
+        }
+
+        .call-btn:hover {
+            background: rgba(107, 114, 128, 0.1);
+            border-color: var(--neon-text);
+            transform: scale(1.02);
+        }
+
+        .call-btn.active {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--call-active);
+            color: var(--call-active);
+            animation: pulse-call 1.5s infinite;
+        }
+
+        @keyframes pulse-call {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .voice-btn {
+            background: transparent;
+            border: 1px solid var(--neon-border);
+            border-radius: 40px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.3rem;
+            box-shadow: var(--neon-glow);
+        }
+
+        .voice-btn:hover {
+            background: rgba(107, 114, 128, 0.1);
+            border-color: var(--neon-text);
+            transform: scale(1.02);
+        }
+
+        .voice-btn.listening {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--voice-active);
+            color: var(--voice-active);
+            animation: pulse-voice 1.5s infinite;
+        }
+
+        .voice-btn.speaking {
+            background: rgba(107, 114, 128, 0.2);
+            border-color: var(--neon-text);
+            color: var(--neon-text);
+            animation: pulse-speak 1.5s infinite;
+        }
+
+        @keyframes pulse-voice {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulse-speak {
+            0% { box-shadow: 0 0 0 0 rgba(107, 114, 128, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(107, 114, 128, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(107, 114, 128, 0); }
+        }
+
+        .file-name {
+            font-size: 0.75rem;
+            color: var(--neon-text);
+            max-width: 100px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            background: #f0f0f2;
+            padding: 4px 10px;
+            border-radius: 30px;
+            border: 1px solid var(--neon-border);
+        }
+
+        button#send-btn {
+            padding: 0 28px;
+            border-radius: 60px;
+            border: none;
+            background: var(--gradient-gem);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+            transition: all 0.18s;
+            box-shadow: var(--neon-glow);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            height: 48px;
+            min-width: 100px;
+        }
+
+        button#send-btn:hover {
+            opacity: 0.95;
+            transform: scale(1.02) translateY(-1px);
+            box-shadow: 0 12px 20px -8px rgba(107, 114, 128, 0.5);
+        }
+
+        button#send-btn:disabled {
+            background: #e5e5e5;
+            box-shadow: none;
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .chat-container { height: 96vh; border-radius: 24px; }
+            .message { max-width: 90%; }
+            .input-area { padding: 16px 18px; }
+            .attach-btn, .voice-btn, .call-btn { height: 42px; }
+            .call-btn { padding: 0 12px; font-size: 0.8rem; }
+            button#send-btn { padding: 0 18px; min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <header>
+        <div class="brand">
+            <h1>Trion · Vision</h1>
+            <div class="badge">
+                <span id="status"><i class="fas fa-circle"></i> Iniciando...</span>
+            </div>
+        </div>
+        <div class="header-controls">
+            <div class="toggle-container">
+                <span class="toggle-label">Modo Trion</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="triaModeToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button class="btn-clear" onclick="clearChat()"><i class="fas fa-trash-alt"></i> <span>Nueva charla</span></button>
+        </div>
+    </header>
+
+    <div id="chat-box" class="chat-box"></div>
+
+    <div class="input-area">
+        <!-- Adjuntar imagen -->
+        <label class="attach-btn" title="Subir imagen (análisis visual)">
+            <i class="fas fa-image"></i>
+            <input type="file" id="imageUpload" accept="image/*">
+        </label>
+        
+        <!-- Mostrar nombre del archivo -->
+        <span id="fileLabel" class="file-name" style="display: none;"></span>
+
+        <!-- Botón de llamada continua (NUEVO) -->
+        <button id="callModeBtn" class="call-btn" title="Modo llamada continua - Habla y escucha sin parar">
+            <i class="fas fa-phone-alt"></i>
+            <span>Llamada</span>
+        </button>
+
+        <!-- Controles de voz -->
+        <div class="voice-controls">
+            <button id="voiceInputBtn" class="voice-btn" title="Hablar ahora (manual)">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button id="voiceOutputBtn" class="voice-btn" title="Activar/desactivar respuesta por voz">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+
+        <div class="input-wrapper">
+            <i class="fas fa-chevron-right"></i>
+            <input type="text" id="user-input" placeholder="Escribe o activa llamada para hablar...">
+        </div>
+        <button id="send-btn"><i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Enviar</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // API Key de Groq
+        const API_KEY = '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';
+        const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        
+        // Modelo: Llama 4 Maverick
+        const MODEL_NAME = 'meta-llama/llama-4-maverick-17b-128e-instruct';
+
+        // Prompts
+        const BASE_SYSTEM_PROMPT = "Tu nombre es Trion. Tu creador es Hugo Tribaldos. Responde de forma amable, clara y útil. Usa un tono moderno pero profesional. No uses asteriscos ni emojis en tus respuestas. El lenguaje debe ser puramente textual.";
+        const TRIA_MODE_SYSTEM_PROMPT = "Tu nombre es Trion. Tu creador es Hugo Tribaldos. Debes responder de forma extremadamente detallada, abundante en texto, explicando las cosas con gran profundidad y amplitud. Eres conversacional y te gusta explayarte. Usa un tono moderno, profesional pero cercano. No uses asteriscos ni emojis. Tu objetivo es que el usuario sienta que recibe información muy completa y extensa.";
+
+        // Elementos
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const statusDiv = document.getElementById('status');
+        const triaModeToggle = document.getElementById('triaModeToggle');
+        const imageUpload = document.getElementById('imageUpload');
+        const fileLabel = document.getElementById('fileLabel');
+        const voiceInputBtn = document.getElementById('voiceInputBtn');
+        const voiceOutputBtn = document.getElementById('voiceOutputBtn');
+        const callModeBtn = document.getElementById('callModeBtn');
+
+        // Variables de estado
+        let isListening = false;
+        let isVoiceOutputEnabled = true;
+        let isCallModeActive = false; // Modo llamada continua
+        let isProcessing = false; // Para evitar múltiples envíos
+        let recognition = null;
+        let synthesis = window.speechSynthesis;
+        let currentUtterance = null;
+
+        // Variables para imagen
+        let currentImageBase64 = null;
+        let currentImageMime = null;
+
+        // Inicializar reconocimiento de voz
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'es-ES';
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    voiceInputBtn.classList.add('listening');
+                    voiceInputBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                    
+                    if (isCallModeActive) {
+                        statusDiv.innerHTML = '<i class="fas fa-circle" style="color:#ef4444;"></i> Llamada activa · escuchando...';
+                    } else {
+                        statusDiv.innerHTML = '<i class="fas fa-circle" style="color:#10b981;"></i> Escuchando...';
+                    }
+                };
+
+                recognition.onend = function() {
+                    isListening = false;
+                    voiceInputBtn.classList.remove('listening');
+                    voiceInputBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    
+                    // Si está en modo llamada y no está procesando, volver a escuchar
+                    if (isCallModeActive && !isProcessing) {
+                        setTimeout(() => {
+                            if (isCallModeActive && !isListening && !isProcessing) {
+                                startListening();
+                            }
+                        }, 100);
+                    }
+                    
+                    updateStatus();
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    userInput.value = transcript;
+                    
+                    // En modo llamada, enviar automáticamente
+                    if (isCallModeActive) {
+                        sendMessage();
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Error de reconocimiento:', event.error);
+                    isListening = false;
+                    voiceInputBtn.classList.remove('listening');
+                    voiceInputBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    
+                    if (event.error === 'no-speech') {
+                        // En modo llamada, seguir escuchando
+                        if (isCallModeActive && !isProcessing) {
+                            setTimeout(() => {
+                                if (isCallModeActive && !isListening && !isProcessing) {
+                                    startListening();
+                                }
+                            }, 500);
+                        }
+                    }
+                    
+                    updateStatus();
+                };
+            } else {
+                console.warn('Reconocimiento de voz no soportado');
+                voiceInputBtn.style.display = 'none';
+                callModeBtn.style.display = 'none';
+            }
+        }
+
+        // Función para comenzar a escuchar
+        function startListening() {
+            if (!recognition || isListening || isProcessing) return;
+            
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Error starting recognition:', error);
+                isListening = false;
+            }
+        }
+
+        // Función para detener escucha
+        function stopListening() {
+            if (recognition && isListening) {
+                try {
+                    recognition.stop();
+                } catch (error) {
+                    console.error('Error stopping recognition:', error);
+                }
+            }
+            isListening = false;
+        }
+
+        // Función para hablar
+        function speak(text) {
+            if (!isVoiceOutputEnabled || !synthesis) return;
+            
+            // Detener cualquier habla en curso
+            if (synthesis.speaking) {
+                synthesis.cancel();
+            }
+            
+            // Limpiar el texto de marcadores HTML
+            const cleanText = text.replace(/<[^>]*>/g, '');
+            
+            currentUtterance = new SpeechSynthesisUtterance(cleanText);
+            currentUtterance.lang = 'es-ES';
+            currentUtterance.rate = 1.0;
+            currentUtterance.pitch = 1.0;
+            currentUtterance.volume = 1.0;
+            
+            // Buscar voz en español
+            const voices = synthesis.getVoices();
+            const spanishVoice = voices.find(voice => voice.lang.includes('es'));
+            if (spanishVoice) {
+                currentUtterance.voice = spanishVoice;
+            }
+            
+            currentUtterance.onstart = function() {
+                voiceOutputBtn.classList.add('speaking');
+                voiceOutputBtn.innerHTML = '<i class="fas fa-volume-off"></i>';
+                isProcessing = true; // Bloquear mientras habla
+                
+                if (isCallModeActive) {
+                    statusDiv.innerHTML = '<i class="fas fa-circle" style="color:#ef4444;"></i> Llamada activa · hablando...';
+                }
+            };
+            
+            currentUtterance.onend = function() {
+                voiceOutputBtn.classList.remove('speaking');
+                voiceOutputBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                isProcessing = false;
+                
+                // En modo llamada, volver a escuchar después de hablar
+                if (isCallModeActive && !isListening) {
+                    setTimeout(() => {
+                        if (isCallModeActive && !isListening && !isProcessing) {
+                            startListening();
+                        }
+                    }, 300);
+                }
+                
+                updateStatus();
+            };
+            
+            currentUtterance.onerror = function() {
+                voiceOutputBtn.classList.remove('speaking');
+                voiceOutputBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                isProcessing = false;
+                
+                if (isCallModeActive && !isListening) {
+                    setTimeout(() => {
+                        if (isCallModeActive && !isListening && !isProcessing) {
+                            startListening();
+                        }
+                    }, 300);
+                }
+                
+                updateStatus();
+            };
+            
+            synthesis.speak(currentUtterance);
+        }
+
+        // Detener habla
+        function stopSpeaking() {
+            if (synthesis && synthesis.speaking) {
+                synthesis.cancel();
+                voiceOutputBtn.classList.remove('speaking');
+                voiceOutputBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                isProcessing = false;
+            }
+        }
+
+        // Actualizar estado
+        function updateStatus() {
+            if (isCallModeActive) {
+                if (isProcessing) {
+                    statusDiv.innerHTML = '<i class="fas fa-circle" style="color:#ef4444;"></i> Llamada activa · procesando...';
+                } else if (isListening) {
+                    statusDiv.innerHTML = '<i class="fas fa-circle" style="color:#ef4444;"></i> Llamada activa · escuchando...';
+                } else {
+                    statusDiv.innerHTML = '<i class="fas fa-circle" style="color:#ef4444;"></i> Llamada activa';
+                }
+            } else {
+                statusDiv.innerHTML = '<i class="fas fa-circle" style="color:#9ca3af;"></i> Activo · listo';
+            }
+        }
+
+        // Activar/desactivar modo llamada
+        function toggleCallMode() {
+            isCallModeActive = !isCallModeActive;
+            
+            if (isCallModeActive) {
+                callModeBtn.classList.add('active');
+                callModeBtn.innerHTML = '<i class="fas fa-phone-slash"></i><span>Colgar</span>';
+                userInput.placeholder = 'Modo llamada activado - Habla libremente...';
+                
+                // Detener cualquier escucha anterior y empezar nueva
+                stopListening();
+                stopSpeaking();
+                
+                // Pequeña pausa antes de empezar a escuchar
+                setTimeout(() => {
+                    if (isCallModeActive && !isListening && !isProcessing) {
+                        startListening();
+                    }
+                }, 500);
+            } else {
+                callModeBtn.classList.remove('active');
+                callModeBtn.innerHTML = '<i class="fas fa-phone-alt"></i><span>Llamada</span>';
+                userInput.placeholder = 'Escribe o activa llamada para hablar...';
+                
+                // Detener todo
+                stopListening();
+                stopSpeaking();
+                isProcessing = false;
+            }
+            
+            updateStatus();
+        }
+
+        function getActiveSystemPrompt() {
+            return triaModeToggle.checked ? TRIA_MODE_SYSTEM_PROMPT : BASE_SYSTEM_PROMPT;
+        }
+
+        // Cargar historial
+        function loadHistory() {
+            try {
+                const history = JSON.parse(localStorage.getItem('trion_chat_history_v4')) || [];
+                
+                chatBox.innerHTML = '';
+                
+                if (history.length === 0) {
+                    appendMessage('ai', 'Hola, soy Trion. Creado por Hugo Tribaldos', false);
+                } else {
+                    history.forEach(msg => {
+                        if (msg.role === 'user' && msg.imageData) {
+                            appendUserMessageWithImage(msg.text, msg.imageData, msg.mime, false);
+                        } else if (msg.role === 'user') {
+                            appendMessage('user', msg.text, false);
+                        } else if (msg.role === 'ai') {
+                            appendMessage('ai', msg.text, false);
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Error loading history:', e);
+                appendMessage('ai', 'Hola, soy Trion.', false);
+            }
+        }
+
+        // Guardar mensaje
+        function saveMessage(role, text) {
+            try {
+                const history = JSON.parse(localStorage.getItem('trion_chat_history_v4')) || [];
+                history.push({ role, text });
+                localStorage.setItem('trion_chat_history_v4', JSON.stringify(history));
+            } catch (e) {
+                console.error('Error saving message:', e);
+            }
+        }
+
+        // Guardar mensaje con imagen
+        function saveUserMessageWithImage(text, imageData, mime) {
+            try {
+                const history = JSON.parse(localStorage.getItem('trion_chat_history_v4')) || [];
+                history.push({ role: 'user', text, imageData, mime });
+                localStorage.setItem('trion_chat_history_v4', JSON.stringify(history));
+            } catch (e) {
+                console.error('Error saving message with image:', e);
+            }
+        }
+
+        // Append mensaje simple
+        function appendMessage(role, text, shouldSave = true) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', role);
+            let formattedText = text.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+            msgDiv.innerHTML = formattedText;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            if (role === 'ai' && isVoiceOutputEnabled) {
+                speak(text);
+            }
+            
+            if (shouldSave) saveMessage(role, text);
+            return msgDiv;
+        }
+
+        // Append mensaje con imagen
+        function appendUserMessageWithImage(text, base64Data, mimeType, shouldSave = true) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', 'user');
+            
+            if (text && text.trim() !== '') {
+                let textFormatted = text.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+                msgDiv.innerHTML = textFormatted;
+            } else {
+                msgDiv.innerHTML = '[Imagen enviada]';
+            }
+            
+            const img = document.createElement('img');
+            img.src = `data:${mimeType};base64,${base64Data}`;
+            img.classList.add('message-image-preview');
+            msgDiv.appendChild(img);
+            
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            if (shouldSave) {
+                saveUserMessageWithImage(text, base64Data, mimeType);
+            }
+            return msgDiv;
+        }
+
+        // Mostrar "pensando"
+        function showThinkingMessage() {
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.classList.add('message', 'ai');
+            thinkingDiv.id = 'thinking-msg';
+            const dotsContainer = document.createElement('span');
+            dotsContainer.classList.add('thinking-dots');
+            dotsContainer.innerHTML = '<span></span><span></span><span></span>';
+            thinkingDiv.appendChild(dotsContainer);
+            chatBox.appendChild(thinkingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return thinkingDiv;
+        }
+
+        window.clearChat = function() {
+            localStorage.removeItem('trion_chat_history_v4');
+            chatBox.innerHTML = '';
+            appendMessage('ai', 'Historial borrado. Activa el modo llamada para conversación continua.', false);
+            currentImageBase64 = null;
+            currentImageMime = null;
+            fileLabel.style.display = 'none';
+            fileLabel.innerText = '';
+            imageUpload.value = '';
+            stopListening();
+            stopSpeaking();
+            if (isCallModeActive) toggleCallMode();
+        };
+
+        // Inicializar
+        function initAI() {
+            updateStatus();
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+        }
+
+        // Manejar selección de imagen
+        imageUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                currentImageBase64 = null;
+                currentImageMime = null;
+                fileLabel.style.display = 'none';
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor selecciona un archivo de imagen válido.');
+                imageUpload.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const base64WithPrefix = ev.target.result;
+                const parts = base64WithPrefix.split(',');
+                currentImageMime = file.type;
+                currentImageBase64 = parts[1];
+                
+                fileLabel.innerText = file.name;
+                fileLabel.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Enviar mensaje
+        async function sendMessage() {
+            const prompt = userInput.value.trim();
+
+            if ((!prompt && !currentImageBase64) || isProcessing) return;
+
+            // Detener escucha mientras se procesa
+            stopListening();
+            isProcessing = true;
+
+            // Mostrar mensaje de usuario
+            if (currentImageBase64) {
+                appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime, true);
+            } else {
+                appendMessage('user', prompt, true);
+            }
+
+            userInput.value = '';
+            
+            const imageToSend = currentImageBase64;
+            const mimeToSend = currentImageMime;
+            
+            // Reset imagen
+            currentImageBase64 = null;
+            currentImageMime = null;
+            imageUpload.value = '';
+            fileLabel.style.display = 'none';
+            fileLabel.innerText = '';
+
+            const thinkingMsg = showThinkingMessage();
+
+            try {
+                const history = JSON.parse(localStorage.getItem('trion_chat_history_v4')) || [];
+                
+                let messages = [
+                    {
+                        role: "system",
+                        content: getActiveSystemPrompt()
+                    }
+                ];
+
+                for (let msg of history) {
+                    if (msg.role === 'user' && !msg.imageData) {
+                        messages.push({
+                            role: "user",
+                            content: msg.text
+                        });
+                    } else if (msg.role === 'ai') {
+                        messages.push({
+                            role: "assistant",
+                            content: msg.text
+                        });
+                    }
+                }
+
+                let userContent = [];
+                
+                if (prompt) {
+                    userContent.push({
+                        type: "text",
+                        text: prompt
+                    });
+                } else {
+                    userContent.push({
+                        type: "text",
+                        text: "Describeme esta imagen."
+                    });
+                }
+
+                if (imageToSend) {
+                    userContent.push({
+                        type: "image_url",
+                        image_url: {
+                            url: `data:${mimeToSend};base64,${imageToSend}`
+                        }
+                    });
+                }
+
+                messages.push({
+                    role: "user",
+                    content: userContent
+                });
+
+                const requestBody = {
+                    model: MODEL_NAME,
+                    messages: messages,
+                    max_tokens: 2048,
+                    temperature: 0.9
+                };
+
+                console.log('Enviando a Groq API...');
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorData}`);
+                }
+                
+                const data = await response.json();
+                
+                let aiResponse = data?.choices?.[0]?.message?.content;
+                
+                if (!aiResponse) {
+                    aiResponse = 'Lo siento, no pude generar una respuesta.';
+                }
+
+                aiResponse = aiResponse.replace(/[*]/g, '').replace(/[\u{1F600}-\u{1F6FF}]/gu, '');
+
+                thinkingMsg.remove();
+                appendMessage('ai', aiResponse, true);
+                
+            } catch (e) {
+                console.error('Error sending message:', e);
+                thinkingMsg.remove();
+                appendMessage('ai', `Error: ${e.message}`, true);
+                isProcessing = false;
+                
+                // En modo llamada, volver a escuchar después del error
+                if (isCallModeActive && !isListening) {
+                    setTimeout(() => {
+                        if (isCallModeActive && !isListening && !isProcessing) {
+                            startListening();
+                        }
+                    }, 500);
+                }
+            }
+        }
+
+        // Event listeners
+        voiceInputBtn.addEventListener('click', function() {
+            if (!recognition) {
+                alert('Reconocimiento de voz no soportado');
+                return;
+            }
+            
+            if (isListening) {
+                stopListening();
+            } else {
+                // Si está en modo llamada, desactivarlo temporalmente para modo manual
+                if (isCallModeActive) {
+                    toggleCallMode();
+                }
+                startListening();
+            }
+        });
+
+        voiceOutputBtn.addEventListener('click', function() {
+            if (synthesis.speaking) {
+                stopSpeaking();
+                isVoiceOutputEnabled = false;
+                voiceOutputBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            } else {
+                isVoiceOutputEnabled = !isVoiceOutputEnabled;
+                voiceOutputBtn.innerHTML = isVoiceOutputEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+            }
+        });
+
+        callModeBtn.addEventListener('click', toggleCallMode);
+
+        sendBtn.addEventListener('click', function() {
+            if (isCallModeActive) {
+                toggleCallMode(); // Salir del modo llamada si se usa el botón enviar
+            }
+            sendMessage();
+        });
+
+        userInput.addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') {
+                if (isCallModeActive) {
+                    toggleCallMode(); // Salir del modo llamada si se escribe
+                }
+                sendMessage();
+            }
+        });
+
+        // Precargar voces
+        if (synthesis) {
+            synthesis.onvoiceschanged = function() {
+                // Voces cargadas
+            };
+        }
+
+        // Inicializar
+        initSpeechRecognition();
+        loadHistory();
+        initAI();
+    })();
+</script>
+</body>
+</html>
