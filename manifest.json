@@ -1,0 +1,46 @@
+{
+  "name": "TRION AI",
+  "short_name": "TRION",
+  "description": "Asistente AI avanzado con múltiples modos de respuesta - Rápido, Normal y Pro",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "background_color": "#0a0a0c",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "16x16 32x32 48x48 72x72 96x96 128x128 144x144 152x152 167x167 180x180 192x192 256x256 384x384 512x512 1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Modo Rápido",
+      "short_name": "Rápido",
+      "description": "Respuestas concisas y directas",
+      "url": "/?mode=rapido",
+      "icons": [{ "src": "logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Modo Normal",
+      "short_name": "Normal",
+      "description": "Respuestas equilibradas",
+      "url": "/?mode=normal",
+      "icons": [{ "src": "logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Modo Pro",
+      "short_name": "Pro",
+      "description": "Análisis profundo y detallado",
+      "url": "/?mode=pro",
+      "icons": [{ "src": "logo.png", "sizes": "96x96" }]
+    }
+  ],
+  "categories": ["productivity", "utilities", "ai"],
+  "lang": "es",
+  "dir": "ltr"
+}
