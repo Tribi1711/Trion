@@ -1,20 +1,103 @@
 {
-  "name": "Trion",
-  "short_name": "Trion",
-  "start_url": "./index.html",
+  "name": "TRION AI - Asistente Inteligente",
+  "short_name": "TRION",
+  "description": "Asistente AI avanzado con modos Rápido, Normal y Pro. Procesa imágenes y archivos.",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "display_override": ["standalone", "fullscreen", "window-controls-overlay"],
+  "background_color": "#0a0a0c",
+  "theme_color": "#7c3aed",
+  "orientation": "any",
+  "scope": "/",
   "icons": [
     {
       "src": "foto.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "foto.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "foto.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "foto.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Modo Rápido",
+      "short_name": "⚡ Rápido",
+      "description": "Respuestas concisas y directas",
+      "url": "/?mode=rapido",
+      "icons": [
+        {
+          "src": "foto.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Modo Normal",
+      "short_name": "🤖 Normal",
+      "description": "Respuestas equilibradas",
+      "url": "/?mode=normal",
+      "icons": [
+        {
+          "src": "foto.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Modo Pro",
+      "short_name": "👑 Pro",
+      "description": "Análisis profundo y detallado",
+      "url": "/?mode=pro",
+      "icons": [
+        {
+          "src": "foto.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "categories": ["productivity", "utilities", "business"],
+  "lang": "es",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "screenshots": [
+    {
+      "src": "foto.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vista principal de TRION AI"
+    },
+    {
+      "src": "foto.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vista móvil de TRION AI"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": ["focus-existing", "auto"]
+  },
+  "edge_side_panel": {
+    "preferred_width": 480
+  }
 }
