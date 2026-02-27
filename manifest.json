@@ -1,6 +1,6 @@
 {
-  "name": "TribiTV",
-  "short_name": "TribiTV",
+  "name": "Trion",
+  "short_name": "Trion",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
