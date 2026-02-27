@@ -14,15 +14,15 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="TRION - Asistente AI avanzado con múltiples modos de respuesta">
 
-    <!-- PWA Icons Links - Todos usando logo.png -->
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="logo.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="logo.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="logo.png">
+    <!-- PWA Icons Links - Todos usando foto.png -->
+    <link rel="apple-touch-icon" href="foto.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="foto.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="foto.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="foto.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="foto.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="foto.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="foto.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="foto.png">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -78,7 +78,6 @@
             --chat-padding: 32px 32px 24px;
             --brand-gap: 16px;
             --logo-size: 52px;
-            --logo-icon-size: 32px;
             --title-size: 2.4rem;
             --control-gap: 16px;
             --btn-padding: 8px 20px;
@@ -95,7 +94,6 @@
                 --chat-padding: 20px 16px 16px;
                 --brand-gap: 10px;
                 --logo-size: 42px;
-                --logo-icon-size: 24px;
                 --title-size: 1.6rem;
                 --control-gap: 8px;
                 --btn-padding: 6px 12px;
@@ -182,7 +180,8 @@
             box-shadow: 0 0 60px var(--accent-glow);
             position: relative;
             overflow: hidden;
-            padding: 20px;
+            padding: 0; /* Quitamos padding para que la imagen llene todo */
+            aspect-ratio: 1 / 1; /* Forzar que sea cuadrado */
         }
 
         .splash-logo::after {
@@ -195,12 +194,13 @@
             background: linear-gradient(135deg, transparent, rgba(255,255,255,0.2), transparent);
             transform: rotate(45deg);
             animation: logoShine 2s infinite;
+            pointer-events: none;
         }
 
         .splash-logo img {
-            width: min(70px, 18vw);
-            height: min(70px, 18vw);
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cambiado a cover para llenar el espacio */
             filter: brightness(0) invert(1);
             position: relative;
             z-index: 2;
@@ -325,7 +325,8 @@
             box-shadow: 0 0 40px var(--accent-glow);
             position: relative;
             overflow: hidden;
-            padding: 10px;
+            padding: 0; /* Quitamos padding para que la imagen llene todo */
+            aspect-ratio: 1 / 1; /* Forzar que sea cuadrado */
         }
 
         .logo::after {
@@ -338,6 +339,7 @@
             background: linear-gradient(135deg, transparent, rgba(255,255,255,0.2), transparent);
             transform: rotate(45deg);
             animation: logoShine 6s infinite;
+            pointer-events: none;
         }
 
         @keyframes logoShine {
@@ -346,9 +348,9 @@
         }
 
         .logo img {
-            width: var(--logo-icon-size);
-            height: var(--logo-icon-size);
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cambiado a cover para llenar el espacio */
             filter: brightness(0) invert(1);
             position: relative;
             z-index: 2;
@@ -633,9 +635,11 @@
         .ai .message-header img {
             width: 16px;
             height: 16px;
-            object-fit: contain;
+            object-fit: cover; /* Cambiado a cover para llenar el espacio */
             filter: brightness(0) invert(1);
             opacity: 0.9;
+            aspect-ratio: 1 / 1; /* Forzar que sea cuadrado */
+            border-radius: 4px; /* Pequeño borde redondeado */
         }
 
         .ai .message-header span {
@@ -1080,7 +1084,7 @@
 <div class="splash-screen" id="splashScreen">
     <div class="splash-content">
         <div class="splash-logo">
-            <img src="logo.png" alt="TRION">
+            <img src="foto.png" alt="TRION">
         </div>
         <h1 class="splash-title">TRION</h1>
         <div class="splash-loader">
@@ -1095,7 +1099,7 @@
     <header>
         <div class="brand">
             <div class="logo">
-                <img src="logo.png" alt="TRION">
+                <img src="foto.png" alt="TRION">
             </div>
             <h1>TRION</h1>
             <div class="badge">
@@ -1399,7 +1403,7 @@
                 header.classList.add('message-header');
                 
                 const logoImg = document.createElement('img');
-                logoImg.src = 'logo.png';
+                logoImg.src = 'foto.png';
                 logoImg.alt = 'TRION';
                 
                 const span = document.createElement('span');
