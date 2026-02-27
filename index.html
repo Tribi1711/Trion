@@ -4,10 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>TRION · AI</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TRION AI">
+    <meta name="application-name" content="TRION AI">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="TRION - Asistente AI avanzado con múltiples modos de respuesta">
+
+    <!-- PWA Icons Links - Todos usando logo.png -->
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="logo.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Existing links -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Error al registrar ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
+
     <style>
         * {
             margin: 0;
@@ -987,15 +1027,60 @@
             display: block;
             margin-top: 12px;
         }
+
+        /* PWA Install Button */
+        .install-pwa {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 24px;
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 0 30px var(--accent-glow);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .install-pwa:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px var(--accent-glow);
+        }
+
+        .install-pwa i {
+            font-size: 1.1rem;
+        }
+
+        @media (display-mode: standalone) {
+            .install-pwa {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
+
+<!-- Install PWA Button -->
+<button class="install-pwa" id="installButton" style="display: none;">
+    <i class="fas fa-download"></i>
+    Instalar TRION
+</button>
 
 <!-- Splash Screen -->
 <div class="splash-screen" id="splashScreen">
     <div class="splash-content">
         <div class="splash-logo">
-            <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\' style=\'font-size: min(70px, 18vw); color: white;\'></i>';">
+            <img src="logo.png" alt="TRION">
         </div>
         <h1 class="splash-title">TRION</h1>
         <div class="splash-loader">
@@ -1010,7 +1095,7 @@
     <header>
         <div class="brand">
             <div class="logo">
-                <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\' style=\'font-size: var(--logo-icon-size); color: white;\'></i>';">
+                <img src="logo.png" alt="TRION">
             </div>
             <h1>TRION</h1>
             <div class="badge">
@@ -1069,6 +1154,32 @@
 
 <script>
     (function() {
+        // PWA Installation
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'flex';
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log('Usuario respuesta a la instalación:', outcome);
+            
+            deferredPrompt = null;
+            installButton.style.display = 'none';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('TRION ha sido instalado correctamente');
+            installButton.style.display = 'none';
+        });
+
         // Splash screen
         setTimeout(() => {
             document.getElementById('splashScreen').classList.add('fade-out');
@@ -1096,7 +1207,7 @@
         const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
 
-        let currentMode = 'normal'; // normal por defecto
+        let currentMode = 'normal';
         let currentImageBase64 = null;
         let currentImageMime = null;
         let currentFile = null;
@@ -1114,7 +1225,6 @@
         }
 
         function updateModeUI() {
-            // Actualizar opciones activas
             document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
             
             if (currentMode === 'rapido') {
@@ -1132,7 +1242,6 @@
             }
         }
 
-        // Mode selection
         rapidMode.addEventListener('click', () => {
             currentMode = 'rapido';
             updateModeUI();
@@ -1199,7 +1308,7 @@
                 return;
             }
 
-            removeFile(); // Limpiar archivos anteriores
+            removeFile();
             
             currentImageBase64 = await readFileAsBase64(file);
             currentImageMime = file.type;
@@ -1212,14 +1321,13 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // Limitar tamaño a 10MB
             if (file.size > 10 * 1024 * 1024) {
                 alert('El archivo es demasiado grande. Máximo 10MB.');
                 fileUpload.value = '';
                 return;
             }
 
-            removeFile(); // Limpiar archivos anteriores
+            removeFile();
             
             currentFile = file;
             currentFileContent = await readFileAsText(file);
@@ -1293,15 +1401,6 @@
                 const logoImg = document.createElement('img');
                 logoImg.src = 'logo.png';
                 logoImg.alt = 'TRION';
-                logoImg.onerror = function() {
-                    this.style.display = 'none';
-                    const fallback = document.createElement('i');
-                    fallback.className = 'fas fa-brain';
-                    fallback.style.color = 'var(--accent-secondary)';
-                    fallback.style.fontSize = '14px';
-                    header.insertBefore(fallback, this);
-                    this.remove();
-                };
                 
                 const span = document.createElement('span');
                 span.textContent = 'TRION';
@@ -1400,7 +1499,6 @@
                 document.querySelector('.welcome-message').remove();
             }
 
-            // Mostrar mensaje del usuario
             if (currentImageBase64) {
                 appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime, true);
             } else if (currentFile) {
@@ -1457,7 +1555,6 @@
 
                 messages.push({ role: "user", content: userContent });
 
-                // Ajustar temperatura según el modo
                 let temperature = 0.9;
                 if (currentMode === 'rapido') temperature = 0.3;
                 else if (currentMode === 'normal') temperature = 0.7;
