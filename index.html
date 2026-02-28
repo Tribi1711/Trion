@@ -44,6 +44,7 @@
             --btn-padding: 8px 20px;
             --input-height: 56px;
             --send-btn-width: 120px;
+            --call-btn-width: 56px;
             --message-max-width: 75%;
         }
 
@@ -61,6 +62,7 @@
                 --btn-padding: 6px 12px;
                 --input-height: 48px;
                 --send-btn-width: 100%;
+                --call-btn-width: 48px;
                 --message-max-width: 90%;
             }
         }
@@ -70,6 +72,7 @@
                 --logo-size: 38px;
                 --title-size: 1.4rem;
                 --btn-padding: 4px 10px;
+                --call-btn-width: 44px;
                 --message-max-width: 95%;
             }
         }
@@ -497,6 +500,62 @@
             box-shadow: 0 0 30px var(--accent-glow);
         }
 
+        .call-button {
+            width: var(--call-btn-width);
+            height: var(--call-btn-width);
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            order: 5;
+        }
+
+        .call-button.active {
+            animation: pulse-call 1.5s infinite;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+        }
+
+        .call-button.listening {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            animation: pulse-listening 1.5s infinite;
+        }
+
+        @keyframes pulse-call {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px #ef4444; }
+            50% { transform: scale(1.1); box-shadow: 0 0 40px #ef4444; }
+        }
+
+        @keyframes pulse-listening {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px #10b981; }
+            50% { transform: scale(1.1); box-shadow: 0 0 40px #10b981; }
+        }
+
+        .call-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg);
+            animation: callShine 3s infinite;
+        }
+
+        @keyframes callShine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            20%, 100% { transform: translateX(100%) rotate(45deg); }
+        }
+
         .chat-box {
             flex: 1;
             padding: var(--chat-padding);
@@ -854,6 +913,10 @@
             button#send-btn {
                 order: 3;
             }
+            
+            .call-button {
+                order: 5;
+            }
         }
 
         @media (max-width: 480px) {
@@ -864,6 +927,10 @@
             
             button#send-btn {
                 order: 4;
+            }
+            
+            .call-button {
+                order: 5;
             }
         }
 
@@ -1064,6 +1131,9 @@
             <input type="text" id="user-input" placeholder="Pregúntale algo a Trion...">
         </div>
         <button id="send-btn"><i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Enviar</button>
+        <button id="call-button" class="call-button" title="Llamada por voz">
+            <i class="fas fa-phone"></i>
+        </button>
     </div>
 </div>
 
@@ -1079,13 +1149,14 @@
         const MODEL_NAME = 'meta-llama/llama-4-maverick-17b-128e-instruct';
 
         // System prompts for different modes
-        const RAPIDO_SYSTEM_PROMPT = "Tu nombre es Trion. Tu creador es Hugo Triblados. Responde de forma extremadamente concisa, directa y al punto. Usa frases cortas y ve directo a lo importante. No uses emojis ni asteriscos.";
+        const RAPIDO_SYSTEM_PROMPT = "Tu nombre es Trion. Tu creador es Hugo Tribaldos. Responde de forma extremadamente concisa, directa y al punto. Usa frases cortas y ve directo a lo importante. No uses emojis ni asteriscos.";
         const NORMAL_SYSTEM_PROMPT = "Tu nombre es Trion. Tu creador es Hugo Tribaldos. Responde de forma clara, concisa y útil. Usa un tono moderno y profesional. No uses emojis ni asteriscos.";
         const PRO_SYSTEM_PROMPT = "Tu nombre es Trion. Tu creador es Hugo Tribaldos. Responde con respuestas extremadamente detalladas, profundas y elaboradas. Explora cada tema a fondo, proporciona contexto adicional y análisis detallado. Usa un tono conversacional pero profesional. No uses emojis ni asteriscos.";
 
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
+        const callButton = document.getElementById('call-button');
         const statusDiv = document.getElementById('status');
         const selectedModeSpan = document.getElementById('selectedMode');
         const rapidMode = document.getElementById('rapidoMode');
@@ -1096,11 +1167,78 @@
         const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
 
-        let currentMode = 'normal'; // normal por defecto
+        let currentMode = 'normal';
         let currentImageBase64 = null;
         let currentImageMime = null;
         let currentFile = null;
         let currentFileContent = null;
+
+        // Variables para el modo llamada
+        let isCallActive = false;
+        let recognition = null;
+        let speechSynthesis = window.speechSynthesis;
+        let isSpeaking = false;
+        let autoRestartRecognition = true;
+
+        // Inicializar reconocimiento de voz
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'es-ES';
+
+            recognition.onstart = function() {
+                callButton.classList.add('listening');
+                callButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                updateCallStatus('Escuchando...');
+            };
+
+            recognition.onend = function() {
+                callButton.classList.remove('listening');
+                if (isCallActive && autoRestartRecognition && !isSpeaking) {
+                    setTimeout(() => {
+                        if (isCallActive && !isSpeaking) {
+                            recognition.start();
+                        }
+                    }, 500);
+                } else if (!isCallActive) {
+                    callButton.innerHTML = '<i class="fas fa-phone"></i>';
+                }
+            };
+
+            recognition.onresult = async function(event) {
+                const transcript = event.results[0][0].transcript;
+                userInput.value = transcript;
+                
+                if (isCallActive) {
+                    await sendVoiceMessage(transcript);
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Error de reconocimiento:', event.error);
+                if (isCallActive) {
+                    if (event.error === 'no-speech') {
+                        // No se detectó voz, reiniciar
+                        if (autoRestartRecognition) {
+                            setTimeout(() => {
+                                if (isCallActive) recognition.start();
+                            }, 500);
+                        }
+                    } else {
+                        stopCall();
+                    }
+                }
+            };
+        }
+
+        function updateCallStatus(text) {
+            const statusSpan = document.getElementById('status');
+            if (isCallActive) {
+                statusSpan.innerHTML = `<i class="fas fa-circle"></i> LLAMADA · ${text}`;
+            }
+        }
 
         function getActiveSystemPrompt() {
             switch(currentMode) {
@@ -1114,25 +1252,23 @@
         }
 
         function updateModeUI() {
-            // Actualizar opciones activas
             document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
             
             if (currentMode === 'rapido') {
                 rapidMode.classList.add('active');
                 selectedModeSpan.textContent = 'Rápido';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
             } else if (currentMode === 'pro') {
                 proMode.classList.add('active');
                 selectedModeSpan.textContent = 'Pro';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
             } else {
                 normalMode.classList.add('active');
                 selectedModeSpan.textContent = 'Normal';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> NORMAL';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> NORMAL';
             }
         }
 
-        // Mode selection
         rapidMode.addEventListener('click', () => {
             currentMode = 'rapido';
             updateModeUI();
@@ -1199,7 +1335,7 @@
                 return;
             }
 
-            removeFile(); // Limpiar archivos anteriores
+            removeFile();
             
             currentImageBase64 = await readFileAsBase64(file);
             currentImageMime = file.type;
@@ -1212,14 +1348,13 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // Limitar tamaño a 10MB
             if (file.size > 10 * 1024 * 1024) {
                 alert('El archivo es demasiado grande. Máximo 10MB.');
                 fileUpload.value = '';
                 return;
             }
 
-            removeFile(); // Limpiar archivos anteriores
+            removeFile();
             
             currentFile = file;
             currentFileContent = await readFileAsText(file);
@@ -1385,11 +1520,142 @@
         }
 
         window.clearChat = function() {
+            if (isCallActive) {
+                stopCall();
+            }
             localStorage.removeItem('trion_chat_history_v7');
             chatBox.innerHTML = '';
             showWelcomeMessage();
             removeFile();
         };
+
+        function speakText(text) {
+            return new Promise((resolve) => {
+                if (!speechSynthesis) {
+                    resolve();
+                    return;
+                }
+
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+
+                utterance.onstart = () => {
+                    isSpeaking = true;
+                    updateCallStatus('Hablando...');
+                };
+
+                utterance.onend = () => {
+                    isSpeaking = false;
+                    updateCallStatus('Escuchando...');
+                    resolve();
+                };
+
+                utterance.onerror = () => {
+                    isSpeaking = false;
+                    resolve();
+                };
+
+                speechSynthesis.speak(utterance);
+            });
+        }
+
+        async function sendVoiceMessage(prompt) {
+            if (!prompt.trim()) return;
+
+            if (document.querySelector('.welcome-message')) {
+                document.querySelector('.welcome-message').remove();
+            }
+
+            appendMessage('user', prompt, true);
+            userInput.value = '';
+
+            const thinkingMsg = showThinkingMessage();
+
+            try {
+                const history = JSON.parse(localStorage.getItem('trion_chat_history_v7')) || [];
+                
+                let messages = [
+                    {
+                        role: "system",
+                        content: getActiveSystemPrompt()
+                    }
+                ];
+
+                for (let msg of history) {
+                    if (msg.role === 'user' && !msg.imageData && !msg.fileData) {
+                        messages.push({ role: "user", content: msg.text });
+                    } else if (msg.role === 'ai') {
+                        messages.push({ role: "assistant", content: msg.text });
+                    }
+                }
+
+                messages.push({ role: "user", content: prompt });
+
+                let temperature = 0.9;
+                if (currentMode === 'rapido') temperature = 0.3;
+                else if (currentMode === 'normal') temperature = 0.7;
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: MODEL_NAME,
+                        messages: messages,
+                        max_tokens: currentMode === 'pro' ? 4096 : 2048,
+                        temperature: temperature
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}`);
+                }
+                
+                const data = await response.json();
+                let aiResponse = data?.choices?.[0]?.message?.content || 'No pude generar una respuesta.';
+                aiResponse = aiResponse.replace(/[*]/g, '').replace(/[\u{1F600}-\u{1F6FF}]/gu, '');
+
+                thinkingMsg.remove();
+                appendMessage('ai', aiResponse, true);
+
+                // Reproducir respuesta en voz si la llamada está activa
+                if (isCallActive) {
+                    autoRestartRecognition = false;
+                    if (recognition) {
+                        recognition.stop();
+                    }
+                    
+                    await speakText(aiResponse);
+                    
+                    // Reiniciar reconocimiento después de hablar
+                    autoRestartRecognition = true;
+                    if (isCallActive && recognition) {
+                        recognition.start();
+                    }
+                }
+                
+            } catch (e) {
+                console.error('Error:', e);
+                thinkingMsg.remove();
+                appendMessage('ai', `Error: ${e.message}`, true);
+                
+                if (isCallActive) {
+                    autoRestartRecognition = false;
+                    await speakText('Lo siento, hubo un error. Intenta de nuevo.');
+                    autoRestartRecognition = true;
+                    if (isCallActive && recognition) {
+                        recognition.start();
+                    }
+                }
+            }
+        }
 
         async function sendMessage() {
             const prompt = userInput.value.trim();
@@ -1400,7 +1666,6 @@
                 document.querySelector('.welcome-message').remove();
             }
 
-            // Mostrar mensaje del usuario
             if (currentImageBase64) {
                 appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime, true);
             } else if (currentFile) {
@@ -1457,7 +1722,6 @@
 
                 messages.push({ role: "user", content: userContent });
 
-                // Ajustar temperatura según el modo
                 let temperature = 0.9;
                 if (currentMode === 'rapido') temperature = 0.3;
                 else if (currentMode === 'normal') temperature = 0.7;
@@ -1493,6 +1757,49 @@
                 appendMessage('ai', `Error: ${e.message}`, true);
             }
         }
+
+        function stopCall() {
+            if (recognition) {
+                recognition.stop();
+            }
+            speechSynthesis.cancel();
+            isCallActive = false;
+            autoRestartRecognition = true;
+            isSpeaking = false;
+            callButton.classList.remove('active', 'listening');
+            callButton.innerHTML = '<i class="fas fa-phone"></i>';
+            updateModeUI();
+        }
+
+        async function startCall() {
+            if (!recognition) {
+                alert('Tu navegador no soporta reconocimiento de voz. Prueba con Chrome, Edge o Safari.');
+                return;
+            }
+
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                isCallActive = true;
+                callButton.classList.add('active');
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> LLAMADA · Iniciando...';
+                
+                autoRestartRecognition = true;
+                recognition.start();
+                
+            } catch (err) {
+                console.error('Error al acceder al micrófono:', err);
+                alert('No se pudo acceder al micrófono. Por favor, permite el acceso al micrófono.');
+            }
+        }
+
+        callButton.addEventListener('click', () => {
+            if (isCallActive) {
+                stopCall();
+            } else {
+                startCall();
+            }
+        });
 
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
