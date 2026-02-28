@@ -517,6 +517,8 @@
             position: relative;
             overflow: hidden;
             order: 5;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .call-button.active {
@@ -564,6 +566,7 @@
             flex-direction: column;
             gap: 24px;
             scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
         .chat-box::-webkit-scrollbar {
@@ -802,6 +805,8 @@
             font-size: clamp(1.2rem, 5vw, 1.4rem);
             position: relative;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .attach-btn::before {
@@ -881,6 +886,8 @@
             font-size: 0.8rem;
             padding: 4px;
             transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .file-remove:hover {
@@ -961,6 +968,8 @@
             letter-spacing: 0.2px;
             backdrop-filter: blur(5px);
             height: var(--input-height);
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         input:focus {
@@ -996,6 +1005,8 @@
             box-shadow: 0 0 30px var(--accent-glow);
             border: 1px solid rgba(255, 255, 255, 0.1);
             order: 4;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         button#send-btn::before {
@@ -1053,6 +1064,44 @@
         .welcome-message span {
             display: block;
             margin-top: 12px;
+        }
+
+        /* Indicador de voz */
+        .voice-indicator {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 40px;
+            color: white;
+            font-size: 1rem;
+            z-index: 1000;
+            border: 1px solid var(--accent-primary);
+            box-shadow: 0 0 30px var(--accent-glow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideUp 0.3s ease;
+            pointer-events: none;
+        }
+
+        .voice-indicator i {
+            color: var(--accent-primary);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
         }
     </style>
 </head>
@@ -1179,64 +1228,165 @@
         let speechSynthesis = window.speechSynthesis;
         let isSpeaking = false;
         let autoRestartRecognition = true;
+        let voiceIndicator = null;
+        let preferredVoice = null;
 
-        // Inicializar reconocimiento de voz
+        // Detectar si es móvil
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        // Crear indicador de voz
+        function showVoiceIndicator(text) {
+            if (voiceIndicator) {
+                voiceIndicator.remove();
+            }
+            voiceIndicator = document.createElement('div');
+            voiceIndicator.className = 'voice-indicator';
+            voiceIndicator.innerHTML = `<i class="fas fa-microphone"></i> ${text}`;
+            document.body.appendChild(voiceIndicator);
+            
+            setTimeout(() => {
+                if (voiceIndicator) {
+                    voiceIndicator.remove();
+                    voiceIndicator = null;
+                }
+            }, 2000);
+        }
+
+        // Función para obtener la mejor voz disponible
+        function getBestVoice() {
+            return new Promise((resolve) => {
+                const voices = speechSynthesis.getVoices();
+                
+                if (voices.length > 0) {
+                    // Buscar voces femeninas en español
+                    const spanishVoices = voices.filter(voice => 
+                        voice.lang.includes('es') && voice.name.toLowerCase().includes('female')
+                    );
+                    
+                    const premiumVoices = voices.filter(voice => 
+                        voice.lang.includes('es') && 
+                        (voice.name.includes('Premium') || voice.name.includes('Enhanced') || voice.name.includes('Neural'))
+                    );
+                    
+                    // Prioridad: Premium/Neural > Femenina > Cualquier español
+                    let selectedVoice = null;
+                    
+                    if (premiumVoices.length > 0) {
+                        selectedVoice = premiumVoices[0];
+                    } else if (spanishVoices.length > 0) {
+                        selectedVoice = spanishVoices[0];
+                    } else {
+                        selectedVoice = voices.find(voice => voice.lang.includes('es'));
+                    }
+                    
+                    if (selectedVoice) {
+                        console.log('Voz seleccionada:', selectedVoice.name);
+                        resolve(selectedVoice);
+                        return;
+                    }
+                }
+                resolve(null);
+            });
+        }
+
+        // Inicializar reconocimiento de voz con configuración específica para móvil
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
+            
+            // Configuración optimizada para móvil
             recognition.continuous = false;
             recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
             recognition.lang = 'es-ES';
+            
+            if (isMobile) {
+                recognition.interimResults = true; // Para mejor feedback en móvil
+                recognition.continuous = false;
+            }
 
             recognition.onstart = function() {
                 callButton.classList.add('listening');
                 callButton.innerHTML = '<i class="fas fa-microphone"></i>';
                 updateCallStatus('Escuchando...');
+                showVoiceIndicator('Escuchando...');
             };
 
             recognition.onend = function() {
                 callButton.classList.remove('listening');
+                if (voiceIndicator) {
+                    voiceIndicator.remove();
+                    voiceIndicator = null;
+                }
+                
                 if (isCallActive && autoRestartRecognition && !isSpeaking) {
                     setTimeout(() => {
                         if (isCallActive && !isSpeaking) {
-                            recognition.start();
+                            try {
+                                recognition.start();
+                            } catch (e) {
+                                console.log('Error reiniciando reconocimiento:', e);
+                            }
                         }
-                    }, 500);
+                    }, isMobile ? 300 : 500);
                 } else if (!isCallActive) {
                     callButton.innerHTML = '<i class="fas fa-phone"></i>';
                 }
             };
 
             recognition.onresult = async function(event) {
-                const transcript = event.results[0][0].transcript;
-                userInput.value = transcript;
+                let transcript = '';
                 
-                if (isCallActive) {
+                if (isMobile && event.results[0].isFinal) {
+                    transcript = event.results[0][0].transcript;
+                } else if (!isMobile) {
+                    transcript = event.results[0][0].transcript;
+                } else if (event.results[0].isFinal) {
+                    transcript = event.results[0][0].transcript;
+                }
+                
+                if (transcript && isCallActive) {
+                    userInput.value = transcript;
                     await sendVoiceMessage(transcript);
                 }
             };
 
             recognition.onerror = function(event) {
                 console.error('Error de reconocimiento:', event.error);
+                showVoiceIndicator(`Error: ${event.error}`);
+                
                 if (isCallActive) {
                     if (event.error === 'no-speech') {
-                        // No se detectó voz, reiniciar
                         if (autoRestartRecognition) {
                             setTimeout(() => {
-                                if (isCallActive) recognition.start();
-                            }, 500);
+                                if (isCallActive) {
+                                    try {
+                                        recognition.start();
+                                    } catch (e) {}
+                                }
+                            }, isMobile ? 200 : 500);
                         }
-                    } else {
+                    } else if (event.error === 'audio-capture' || event.error === 'not-allowed') {
                         stopCall();
+                        alert('No se pudo acceder al micrófono. Por favor, verifica los permisos.');
+                    } else {
+                        if (autoRestartRecognition) {
+                            setTimeout(() => {
+                                if (isCallActive) {
+                                    try {
+                                        recognition.start();
+                                    } catch (e) {}
+                                }
+                            }, 1000);
+                        }
                     }
                 }
             };
         }
 
         function updateCallStatus(text) {
-            const statusSpan = document.getElementById('status');
             if (isCallActive) {
-                statusSpan.innerHTML = `<i class="fas fa-circle"></i> LLAMADA · ${text}`;
+                statusDiv.innerHTML = `<i class="fas fa-circle"></i> LLAMADA · ${text}`;
             }
         }
 
@@ -1529,8 +1679,8 @@
             removeFile();
         };
 
-        function speakText(text) {
-            return new Promise((resolve) => {
+        async function speakText(text) {
+            return new Promise(async (resolve) => {
                 if (!speechSynthesis) {
                     resolve();
                     return;
@@ -1538,25 +1688,44 @@
 
                 speechSynthesis.cancel();
                 
+                // Obtener la mejor voz disponible
+                if (!preferredVoice) {
+                    preferredVoice = await getBestVoice();
+                }
+                
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'es-ES';
-                utterance.rate = 1;
-                utterance.pitch = 1;
-                utterance.volume = 1;
+                utterance.rate = isMobile ? 0.9 : 1.0; // Más lento en móvil para mejor claridad
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
 
                 utterance.onstart = () => {
                     isSpeaking = true;
                     updateCallStatus('Hablando...');
+                    showVoiceIndicator('Hablando...');
                 };
 
                 utterance.onend = () => {
                     isSpeaking = false;
+                    if (voiceIndicator) {
+                        voiceIndicator.remove();
+                        voiceIndicator = null;
+                    }
                     updateCallStatus('Escuchando...');
                     resolve();
                 };
 
-                utterance.onerror = () => {
+                utterance.onerror = (event) => {
+                    console.error('Error de síntesis:', event);
                     isSpeaking = false;
+                    if (voiceIndicator) {
+                        voiceIndicator.remove();
+                        voiceIndicator = null;
+                    }
                     resolve();
                 };
 
@@ -1629,16 +1798,24 @@
                 if (isCallActive) {
                     autoRestartRecognition = false;
                     if (recognition) {
-                        recognition.stop();
+                        try {
+                            recognition.stop();
+                        } catch (e) {}
                     }
                     
                     await speakText(aiResponse);
                     
-                    // Reiniciar reconocimiento después de hablar
-                    autoRestartRecognition = true;
-                    if (isCallActive && recognition) {
-                        recognition.start();
-                    }
+                    // Pequeña pausa antes de reiniciar reconocimiento
+                    setTimeout(() => {
+                        autoRestartRecognition = true;
+                        if (isCallActive && recognition) {
+                            try {
+                                recognition.start();
+                            } catch (e) {
+                                console.log('Error reiniciando reconocimiento:', e);
+                            }
+                        }
+                    }, isMobile ? 100 : 300);
                 }
                 
             } catch (e) {
@@ -1649,10 +1826,14 @@
                 if (isCallActive) {
                     autoRestartRecognition = false;
                     await speakText('Lo siento, hubo un error. Intenta de nuevo.');
-                    autoRestartRecognition = true;
-                    if (isCallActive && recognition) {
-                        recognition.start();
-                    }
+                    setTimeout(() => {
+                        autoRestartRecognition = true;
+                        if (isCallActive && recognition) {
+                            try {
+                                recognition.start();
+                            } catch (e) {}
+                        }
+                    }, 1000);
                 }
             }
         }
@@ -1760,7 +1941,9 @@
 
         function stopCall() {
             if (recognition) {
-                recognition.stop();
+                try {
+                    recognition.stop();
+                } catch (e) {}
             }
             speechSynthesis.cancel();
             isCallActive = false;
@@ -1768,6 +1951,12 @@
             isSpeaking = false;
             callButton.classList.remove('active', 'listening');
             callButton.innerHTML = '<i class="fas fa-phone"></i>';
+            
+            if (voiceIndicator) {
+                voiceIndicator.remove();
+                voiceIndicator = null;
+            }
+            
             updateModeUI();
         }
 
@@ -1778,14 +1967,26 @@
             }
 
             try {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
+                // Solicitar permiso de micrófono
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop()); // Liberar el stream después de obtener permiso
                 
                 isCallActive = true;
                 callButton.classList.add('active');
                 statusDiv.innerHTML = '<i class="fas fa-circle"></i> LLAMADA · Iniciando...';
                 
-                autoRestartRecognition = true;
-                recognition.start();
+                // Pequeña pausa para asegurar que el micrófono está listo
+                setTimeout(() => {
+                    autoRestartRecognition = true;
+                    if (isCallActive && recognition) {
+                        try {
+                            recognition.start();
+                            showVoiceIndicator('Llamada iniciada');
+                        } catch (e) {
+                            console.error('Error iniciando reconocimiento:', e);
+                        }
+                    }
+                }, isMobile ? 500 : 200);
                 
             } catch (err) {
                 console.error('Error al acceder al micrófono:', err);
@@ -1801,8 +2002,28 @@
             }
         });
 
+        // Prevenir comportamientos por defecto en móvil
+        callButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+        });
+
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+        // Cargar voces disponibles
+        if (speechSynthesis) {
+            if (speechSynthesis.getVoices().length > 0) {
+                getBestVoice().then(voice => {
+                    preferredVoice = voice;
+                });
+            } else {
+                speechSynthesis.addEventListener('voiceschanged', () => {
+                    getBestVoice().then(voice => {
+                        preferredVoice = voice;
+                    });
+                }, { once: true });
+            }
+        }
 
         loadHistory();
         updateModeUI();
