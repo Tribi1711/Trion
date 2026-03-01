@@ -1216,7 +1216,7 @@
                             <i class="fas fa-crown"></i> Pro
                         </div>
                         <div class="mode-option vision-mode" data-mode="vision" id="visionMode">
-                            <i class="fas fa-eye"></i> VISIÓN (llama-4)
+                            <i class="fas fa-eye"></i> TRION VISIÓN
                         </div>
                     </div>
                 </div>
@@ -1631,7 +1631,7 @@
             } else if (currentMode === 'vision') {
                 visionMode.classList.add('active');
                 selectedModeSpan.textContent = 'VISIÓN';
-                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN (llama-4)';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> TRION VISIÓN';
                 document.getElementById('vision-attach-btn').style.borderColor = '#10b981';
                 document.getElementById('vision-attach-btn').style.boxShadow = '0 0 15px #10b981';
             } else {
@@ -1766,12 +1766,12 @@
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
                 <h3>TRION AI · ${new Date().toLocaleDateString('es-ES')}</h3>
-                <p>Selecciona <span style="color:#10b981; font-weight:bold;">VISIÓN (llama-4)</span> para analizar imágenes</p>
+                <p>Selecciona <span style="color:#10b981; font-weight:bold;">TRION VISIÓN</span> para analizar imágenes</p>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
                     <span><i class="fas fa-bolt"></i> Rápido: Texto conciso</span>
                     <span><i class="fas fa-robot"></i> Normal: Texto equilibrado</span>
                     <span><i class="fas fa-crown"></i> Pro: Texto detallado</span>
-                    <span><i class="fas fa-eye" style="color:#10b981;"></i> VISIÓN: Análisis con llama-4</span>
+                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISIÓN:</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1961,7 +1961,7 @@
             // Validaciones específicas para modo visión
             if (currentMode === 'vision') {
                 if (!hasImage) {
-                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda analizarla con llama-4. Estoy en modo VISIÓN y necesito una imagen para ayudarte.', true);
+                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda analizarla con HTR. Estoy en modo VISIÓN y necesito una imagen para ayudarte.', true);
                     userInput.value = '';
                     return;
                 }
