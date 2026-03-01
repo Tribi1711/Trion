@@ -212,16 +212,59 @@
             border-color: rgba(201, 162, 39, 0.3);
         }
 
-        /* Botón de imagen en modo advanced - dorado */
-        body.advanced-mode .attach-btn {
+        /* Botón de mundo en modo advanced - dorado */
+        .advanced-search-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--adv-border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--adv-text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .advanced-search-btn:hover {
+            border-color: var(--adv-accent);
+            color: var(--adv-accent);
+            background: rgba(201, 162, 39, 0.1);
+        }
+
+        .advanced-search-btn.active {
+            background: var(--adv-accent);
+            color: #1e1b2b;
+            border-color: var(--adv-accent);
+        }
+
+        body.advanced-mode .advanced-search-btn {
+            border-color: var(--adv-border);
+            color: var(--adv-text-secondary);
+        }
+
+        body.advanced-mode .advanced-search-btn:hover {
             border-color: var(--adv-accent);
             color: var(--adv-accent);
         }
 
+        body.advanced-mode .advanced-search-btn.active {
+            background: var(--adv-accent);
+            color: #1e1b2b;
+        }
+
+        /* Botón de imagen en modo advanced - dorado */
+        body.advanced-mode .attach-btn {
+            border-color: var(--adv-border);
+            color: var(--adv-text-secondary);
+        }
+
         body.advanced-mode .attach-btn:hover {
-            background: rgba(201, 162, 39, 0.1);
             border-color: var(--adv-accent);
             color: var(--adv-accent);
+            background: rgba(201, 162, 39, 0.1);
         }
 
         body.advanced-mode .file-info {
@@ -1286,6 +1329,12 @@
                 gap: 4px;
             }
 
+            .advanced-search-btn {
+                width: 42px;
+                height: 42px;
+                font-size: 1.1rem;
+            }
+
             .chat-box {
                 padding: 12px;
                 gap: 12px;
@@ -1307,8 +1356,8 @@
             }
 
             .attach-btn {
-                width: 44px;
-                height: 44px;
+                width: 42px;
+                height: 42px;
                 font-size: 1.1rem;
             }
 
@@ -1334,14 +1383,14 @@
             input {
                 padding: 10px 12px 10px 38px;
                 font-size: 0.85rem;
-                height: 44px;
+                height: 42px;
             }
 
             button#send-btn {
                 padding: 0 14px;
                 font-size: 0.75rem;
                 min-width: 70px;
-                height: 44px;
+                height: 42px;
             }
 
             .welcome-message {
@@ -1484,12 +1533,17 @@
                 <span id="status"><i class="fas fa-circle"></i> RÁPIDO</span>
             </div>
             <div class="header-controls">
+                <!-- Botón de mundo para modo advanced (solo visible en advanced) -->
+                <button class="advanced-search-btn" id="advancedSearchBtn" style="display: none;" onclick="toggleAdvancedSearch()">
+                    <i class="fas fa-globe"></i>
+                </button>
+
                 <div class="mode-dropdown">
                     <button class="mode-dropdown-btn">
                         <span id="selectedMode">Rápido</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
-                    <div class="mode-dropdown-content">
+                    <div class="mode-dropdown-content" id="modeDropdownContent">
                         <div class="mode-option active" data-mode="rapido" id="rapidoMode">
                             <i class="fas fa-bolt"></i> Rápido <span class="rapido-counter" id="rapidoCounter">3/3</span>
                         </div>
@@ -1567,7 +1621,7 @@
         const PROMPTS = {
             rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Tono profesional y directo. NO busques información en internet a menos que sea estrictamente necesario.",
             razonamiento: "Eres Trion en modo Razonamiento, un asistente AI experto creado por Hugo Tribaldos con acceso TOTAL a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Debes buscar SIEMPRE información actualizada en Internet para responder. Responde de forma clara y detallada, citando fuentes. Tono profesional.",
-            advanced: "Eres TRION ADVANCED, un asistente AI premium creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Tienes acceso a internet y capacidad de análisis de imágenes. Responde de forma DETALLADA Y PROFUNDA, desarrollando conceptos a fondo. Busca información en internet SOLO cuando sea necesario (preguntas factuales, eventos actuales, etc.). Si es un saludo o conversación casual, no es necesario buscar. Tono experto y elegante."
+            advanced: "Eres TRION ADVANCED, un asistente AI premium creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Tienes acceso a internet y capacidad de análisis de imágenes. Responde de forma DETALLADA Y PROFUNDA, desarrollando conceptos a fondo. Si el usuario activa el botón de búsqueda (mundo), DEBES buscar información en internet. Si no está activado, responde con tu conocimiento normal. Tono experto y elegante."
         };
 
         const chatBox = document.getElementById('chat-box');
@@ -1583,6 +1637,8 @@
         const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
         const fileButtons = document.getElementById('fileButtons');
+        const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+        const modeDropdownContent = document.getElementById('modeDropdownContent');
         const razonamientoPasswordModal = document.getElementById('razonamientoPasswordModal');
         const advancedPasswordModal = document.getElementById('advancedPasswordModal');
         const rapidoCounter = document.getElementById('rapidoCounter');
@@ -1594,6 +1650,9 @@
         // Estados de desbloqueo (se guardan en localStorage)
         let razonamientoUnlocked = false;
         let advancedUnlocked = false;
+
+        // Estado de búsqueda en modo advanced
+        let advancedSearchEnabled = false;
 
         // Contraseñas almacenadas (secretas, solo en localStorage)
         const RAZONAMIENTO_PASSWORD = 'htrion';
@@ -1673,6 +1732,7 @@
                 loadHistory();
                 updateSidebar();
                 updateRapidoCounter();
+                updateAdvancedUI();
             } catch (e) {
                 chats = { default: [] };
                 rapidUsage = {
@@ -1814,6 +1874,18 @@
             document.getElementById('chatSidebar').classList.toggle('open');
         };
 
+        // Función para activar/desactivar búsqueda en modo advanced
+        window.toggleAdvancedSearch = function() {
+            advancedSearchEnabled = !advancedSearchEnabled;
+            if (advancedSearchEnabled) {
+                advancedSearchBtn.classList.add('active');
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> ADVANCED: BÚSQUEDA ACTIVADA';
+            } else {
+                advancedSearchBtn.classList.remove('active');
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> ADVANCED';
+            }
+        };
+
         // Funciones para modos
         window.cancelRazonamientoAccess = function() {
             razonamientoPasswordModal.classList.remove('show');
@@ -1864,34 +1936,62 @@
                 selectedModeSpan.textContent = 'Rápido';
                 statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
                 fileButtons.style.display = 'none';
+                advancedSearchBtn.style.display = 'none';
                 removeFile();
                 // Quitar tema advanced si no está desbloqueado
                 if (!advancedUnlocked) {
                     document.body.classList.remove('advanced-mode');
                 }
                 brandTitle.textContent = 'TRION';
+                // Mostrar todas las opciones en el dropdown
+                document.querySelectorAll('.mode-option').forEach(opt => opt.style.display = 'flex');
             } else if (currentMode === 'razonamiento') {
                 razonamientoMode.classList.add('active');
                 selectedModeSpan.textContent = 'Razonamiento';
                 statusDiv.innerHTML = '<i class="fas fa-circle"></i> RAZONAMIENTO';
                 fileButtons.style.display = 'none';
+                advancedSearchBtn.style.display = 'none';
                 removeFile();
                 // Quitar tema advanced si no está desbloqueado
                 if (!advancedUnlocked) {
                     document.body.classList.remove('advanced-mode');
                 }
                 brandTitle.textContent = 'TRION';
+                // Mostrar todas las opciones en el dropdown
+                document.querySelectorAll('.mode-option').forEach(opt => opt.style.display = 'flex');
             } else if (currentMode === 'advanced') {
                 advancedMode.classList.add('active');
                 selectedModeSpan.textContent = 'Advanced';
                 statusDiv.innerHTML = '<i class="fas fa-circle"></i> ADVANCED';
                 fileButtons.style.display = 'flex'; // Mostrar botón de imagen
+                advancedSearchBtn.style.display = 'flex'; // Mostrar botón de mundo
                 document.body.classList.add('advanced-mode');
                 brandTitle.textContent = 'TRION ADVANCED';
+                // Ocultar las otras opciones en el dropdown (solo dejar Advanced)
+                document.querySelectorAll('.mode-option').forEach(opt => {
+                    if (opt.id !== 'advancedMode') {
+                        opt.style.display = 'none';
+                    } else {
+                        opt.style.display = 'flex';
+                    }
+                });
+                // Reiniciar estado de búsqueda al entrar en advanced
+                advancedSearchEnabled = false;
+                advancedSearchBtn.classList.remove('active');
             }
 
             // Actualizar contador rápido
             updateRapidoCounter();
+            updateAdvancedUI();
+        }
+
+        function updateAdvancedUI() {
+            // Actualizar visibilidad del botón de mundo
+            if (currentMode === 'advanced') {
+                advancedSearchBtn.style.display = 'flex';
+            } else {
+                advancedSearchBtn.style.display = 'none';
+            }
         }
 
         // Listeners para modos
@@ -2006,11 +2106,11 @@
             welcomeDiv.innerHTML = `
                 <h3>TRION AI</h3>
                 <p>TRION · HTR</p>
-                <div class="version-badge">v3.5 (modos secretos)</div>
+                <div class="version-badge">v4.0 (advanced exclusivo)</div>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
                     <span><i class="fas fa-bolt"></i> Rápido: 3 usos diarios</span>
                     <span><i class="fas fa-brain"></i> Razonamiento: búsqueda automática</span>
-                    <span><i class="fas fa-crown"></i> Advanced: tema dorado + imágenes</span>
+                    <span><i class="fas fa-crown"></i> Advanced: tema dorado + imágenes + botón mundo</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -2115,13 +2215,9 @@
             if (currentMode === 'rapido' && !force) return null;
             
             // En modo razonamiento, buscar siempre
-            // En modo advanced, buscar solo si es necesario
-            if (currentMode === 'advanced') {
-                const words = query.trim().split(/\s+/).length;
-                const isGreeting = /^(hola|buenos días|buenas tardes|buenas noches|hey|que tal|como estas|saludos)/i.test(query.trim());
-                if (words < 4 || isGreeting) {
-                    return null; // No buscar en internet
-                }
+            // En modo advanced, buscar solo si el botón está activado
+            if (currentMode === 'advanced' && !advancedSearchEnabled) {
+                return null; // No buscar si el botón no está activado
             }
             
             const cacheKey = query.toLowerCase().trim();
@@ -2260,14 +2356,18 @@
             const thinkingMsg = showThinkingMessage();
 
             try {
-                // Buscar en internet según el modo
+                // Buscar en internet según el modo y estado del botón
                 let searchResult = null;
                 if (currentMode === 'razonamiento') {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET...';
                     searchResult = await searchInternet(prompt, true);
                 } else if (currentMode === 'advanced') {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> ANALIZANDO...';
-                    searchResult = await searchInternet(prompt, false);
+                    if (advancedSearchEnabled) {
+                        statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET...';
+                        searchResult = await searchInternet(prompt, true);
+                    } else {
+                        statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO...';
+                    }
                 } else {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO...';
                 }
