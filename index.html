@@ -79,23 +79,29 @@
         }
 
         .splash-logo {
-            width: 120px;
-            height: 120px;
-            border-radius: 35px;
+            width: 130px;
+            height: 130px;
+            border-radius: 40px;
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 25px;
-            box-shadow: 0 0 70px var(--accent-glow);
-            padding: 25px;
+            box-shadow: 0 0 80px var(--accent-glow);
+            overflow: hidden;
         }
 
         .splash-logo img {
-            width: 70px;
-            height: 70px;
+            width: 75px;
+            height: 75px;
             object-fit: contain;
             filter: brightness(0) invert(1);
+            display: block;
+        }
+
+        .splash-logo i {
+            font-size: 75px;
+            color: white;
         }
 
         .splash-title {
@@ -142,7 +148,7 @@
             to { opacity: 1; }
         }
 
-        /* Sidebar - SIEMPRE VISIBLE EN ESCRITORIO, OCULTABLE EN MÓVIL */
+        /* Sidebar - SIEMPRE VISIBLE EN ESCRITORIO */
         .chat-sidebar {
             width: var(--sidebar-width);
             background: rgba(10, 10, 12, 0.95);
@@ -155,7 +161,6 @@
             z-index: 100;
         }
 
-        /* En móvil, la sidebar se oculta */
         @media (max-width: 768px) {
             .chat-sidebar {
                 position: fixed;
@@ -188,13 +193,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px;
+            overflow: hidden;
         }
 
         .sidebar-logo img {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
             filter: brightness(0) invert(1);
+            display: block;
+        }
+
+        .sidebar-logo i {
+            font-size: 24px;
+            color: white;
         }
 
         .sidebar-header h2 {
@@ -214,6 +226,9 @@
             cursor: pointer;
             font-size: 1.1rem;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .new-chat-btn:hover {
@@ -273,6 +288,9 @@
             color: var(--text-dim);
             cursor: pointer;
             font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .chat-item:hover .delete-chat {
@@ -355,7 +373,6 @@
             gap: 15px;
         }
 
-        /* Botón de menú SOLO visible en móvil */
         .menu-toggle {
             display: none;
             width: 42px;
@@ -384,13 +401,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            overflow: hidden;
         }
 
         .logo img {
             width: 28px;
             height: 28px;
+            object-fit: contain;
             filter: brightness(0) invert(1);
+            display: block;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: white;
         }
 
         .brand h1 {
@@ -593,7 +617,14 @@
         .ai .message-header img {
             width: 16px;
             height: 16px;
+            object-fit: contain;
             filter: brightness(0) invert(1);
+            display: block;
+        }
+
+        .ai .message-header i {
+            font-size: 16px;
+            color: var(--accent-secondary);
         }
 
         .ai .message-header span {
@@ -609,6 +640,22 @@
             border-radius: 18px;
             margin-top: 10px;
             border: 2px solid rgba(124, 58, 237, 0.3);
+        }
+
+        .message-file-preview {
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .message-file-preview i {
+            font-size: 24px;
+            color: var(--accent-secondary);
         }
 
         .thinking {
@@ -713,6 +760,9 @@
             cursor: pointer;
             font-size: 0.8rem;
             padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .input-wrapper {
@@ -761,6 +811,10 @@
             min-width: 100px;
             text-transform: uppercase;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         button#send-btn:hover {
@@ -816,6 +870,10 @@
 
         .voice-indicator.speaking {
             border-color: #10b981;
+        }
+
+        .voice-indicator i {
+            font-size: 1.2rem;
         }
 
         /* Install prompt */
@@ -882,9 +940,11 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* ===== MÓVIL - AJUSTE PERFECTO ===== */
         @media (max-width: 768px) {
             :root {
                 --header-height: 60px;
@@ -921,12 +981,15 @@
             .logo {
                 width: 40px;
                 height: 40px;
-                padding: 8px;
             }
 
             .logo img {
                 width: 24px;
                 height: 24px;
+            }
+
+            .logo i {
+                font-size: 24px;
             }
 
             #status {
@@ -1042,7 +1105,6 @@
             }
         }
 
-        /* Móviles muy pequeños */
         @media (max-width: 380px) {
             .brand h1 {
                 font-size: 1.1rem;
@@ -1082,7 +1144,7 @@
 <div class="splash-screen" id="splashScreen">
     <div class="splash-content">
         <div class="splash-logo">
-            <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\' style=\'font-size: 70px; color: white;\'></i>';">
+            <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
         </div>
         <h1 class="splash-title">TRION</h1>
         <div class="splash-loader">
@@ -1095,7 +1157,7 @@
 
 <!-- App container -->
 <div class="app-container">
-    <!-- Sidebar - SIEMPRE VISIBLE EN ESCRITORIO -->
+    <!-- Sidebar -->
     <div class="chat-sidebar" id="chatSidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
@@ -1129,7 +1191,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo">
-                    <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\' style=\'font-size: 28px; color: white;\'></i>';">
+                    <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
                 </div>
                 <h1>TRION</h1>
                 <span id="status"><i class="fas fa-circle"></i> NORMAL</span>
@@ -1183,7 +1245,7 @@
                 <i class="fas fa-chevron-right"></i>
                 <input type="text" id="user-input" placeholder="Pregúntale algo a Trion...">
             </div>
-            <button id="send-btn"><i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Enviar</button>
+            <button id="send-btn"><i class="fas fa-paper-plane"></i> Enviar</button>
         </div>
     </div>
 </div>
@@ -1208,14 +1270,22 @@
             document.getElementById('splashScreen').classList.add('fade-out');
         }, 2000);
 
+        // ===== CONFIGURACIÓN ACTUALIZADA =====
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-        const MODEL_NAME = 'meta-llama/llama-4-maverick-17b-128e-instruct';
+        
+        // MODELOS ACTUALIZADOS (2024-2025)
+        const MODELS = {
+            rapido: 'llama-3.3-70b-versatile',        // Modelo rápido (2024)
+            normal: 'llama-3.3-70b-versatile',        // Modelo equilibrado
+            pro: 'mixtral-8x7b-32768'                 // Modelo más potente para respuestas largas
+        };
 
+        // System prompts mejorados
         const PROMPTS = {
-            rapido: "Tu nombre es Trion. Creador: Hugo Tribaldos. Responde MUY CONCISO, máximo 2-3 frases.",
-            normal: "Tu nombre es Trion. Creador: Hugo Tribaldos. Responde claro y útil.",
-            pro: "Tu nombre es Trion. Creador: Hugo Tribaldos. Respuestas DETALLADAS y profundas."
+            rapido: "Eres Trion, un asistente AI creado por Hugo Tribaldos. Responde de forma MUY CONCISA, máximo 2-3 frases. Ve directo al punto. Tono amable pero profesional. No uses emojis ni asteriscos.",
+            normal: "Eres Trion, un asistente AI creado por Hugo Tribaldos. Responde de forma clara y útil, con explicaciones equilibradas. Tono profesional y moderno. No uses emojis ni asteriscos.",
+            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Proporciona respuestas DETALLADAS y PROFUNDAS. Explica conceptos a fondo, da ejemplos cuando sea útil. Mantén un tono conversacional pero profesional. No uses emojis ni asteriscos."
         };
 
         const chatBox = document.getElementById('chat-box');
@@ -1368,11 +1438,16 @@
             recognition.onstart = () => {
                 callButton.classList.add('listening');
                 callButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                showVoiceIndicator('Escuchando...', false);
             };
 
             recognition.onend = () => {
                 callButton.classList.remove('listening');
                 if (!isCallActive) callButton.innerHTML = '<i class="fas fa-phone"></i>';
+                if (voiceIndicator && !isSpeaking) {
+                    voiceIndicator.remove();
+                    voiceIndicator = null;
+                }
                 if (isCallActive && autoRestartRecognition && !isSpeaking) {
                     setTimeout(() => {
                         if (isCallActive && !isSpeaking && recognition) {
@@ -1390,6 +1465,12 @@
                     await sendMessage(true);
                 }
             };
+
+            recognition.onerror = (event) => {
+                if (isCallActive && event.error !== 'no-speech') {
+                    stopCall();
+                }
+            };
         }
 
         // Voz mejorada
@@ -1397,8 +1478,21 @@
             return new Promise((resolve) => {
                 const voices = speechSynthesis.getVoices();
                 if (voices.length > 0) {
+                    // Buscar voces premium/neurales en español
+                    const premiumVoices = voices.filter(v => 
+                        v.lang.includes('es') && 
+                        (v.name.includes('Premium') || v.name.includes('Neural') || v.name.includes('Enhanced'))
+                    );
+                    
                     const spanishVoices = voices.filter(v => v.lang.includes('es'));
-                    resolve(spanishVoices[0] || voices[0]);
+                    
+                    if (premiumVoices.length > 0) {
+                        resolve(premiumVoices[0]);
+                    } else if (spanishVoices.length > 0) {
+                        resolve(spanishVoices[0]);
+                    } else {
+                        resolve(voices[0]);
+                    }
                 } else {
                     resolve(null);
                 }
@@ -1441,7 +1535,10 @@
                         callButton.classList.add('listening');
                         callButton.innerHTML = '<i class="fas fa-microphone"></i>';
                     }
-                    if (voiceIndicator) voiceIndicator.remove();
+                    if (voiceIndicator) {
+                        voiceIndicator.remove();
+                        voiceIndicator = null;
+                    }
                     resolve();
                 };
 
@@ -1509,6 +1606,10 @@
             }
         }
 
+        function getActiveModel() {
+            return MODELS[currentMode] || MODELS.normal;
+        }
+
         function getActiveSystemPrompt() {
             return PROMPTS[currentMode];
         }
@@ -1552,43 +1653,76 @@
         window.removeFile = removeFile;
 
         async function readFileAsBase64(file) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
         }
 
         async function readFileAsText(file) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
                 reader.readAsText(file);
             });
         }
 
         imageUpload.addEventListener('change', async function(e) {
             const file = e.target.files[0];
-            if (!file || !file.type.startsWith('image/')) return;
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor selecciona una imagen válida');
+                imageUpload.value = '';
+                return;
+            }
+
             removeFile();
-            currentImageBase64 = await readFileAsBase64(file);
-            currentImageMime = file.type;
-            fileName.textContent = `📷 ${file.name} (${formatFileSize(file.size)})`;
-            fileInfo.style.display = 'flex';
+            
+            try {
+                currentImageBase64 = await readFileAsBase64(file);
+                currentImageMime = file.type;
+                fileName.textContent = `📷 ${file.name} (${formatFileSize(file.size)})`;
+                fileInfo.style.display = 'flex';
+            } catch (error) {
+                alert('Error al leer la imagen');
+                imageUpload.value = '';
+            }
         });
 
         fileUpload.addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
+            
             if (file.size > 10 * 1024 * 1024) {
                 alert('Archivo muy grande (máx 10MB)');
+                fileUpload.value = '';
                 return;
             }
+
+            // Extensiones permitidas
+            const allowedExtensions = ['.txt', '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.csv', '.json', '.js', '.py', '.html', '.css'];
+            const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+            if (!allowedExtensions.includes(fileExt)) {
+                alert('Tipo de archivo no soportado');
+                fileUpload.value = '';
+                return;
+            }
+
             removeFile();
-            currentFile = file;
-            currentFileContent = await readFileAsText(file);
-            fileName.textContent = `📄 ${file.name} (${formatFileSize(file.size)})`;
-            fileInfo.style.display = 'flex';
+            
+            try {
+                currentFile = file;
+                currentFileContent = await readFileAsText(file);
+                fileName.textContent = `📄 ${file.name} (${formatFileSize(file.size)})`;
+                fileInfo.style.display = 'flex';
+            } catch (error) {
+                alert('Error al leer el archivo');
+                fileUpload.value = '';
+            }
         });
 
         function loadHistory() {
@@ -1599,10 +1733,16 @@
             } else {
                 history.forEach(msg => {
                     if (msg.role === 'user') {
-                        if (msg.imageData) appendUserMessageWithImage(msg.text, msg.imageData, msg.mime, false);
-                        else if (msg.fileData) appendUserMessageWithFile(msg.text, msg.fileName, msg.fileSize, false);
-                        else appendMessage('user', msg.text, false);
-                    } else appendMessage('ai', msg.text, false);
+                        if (msg.imageData) {
+                            appendUserMessageWithImage(msg.text, msg.imageData, msg.mime, false);
+                        } else if (msg.fileData) {
+                            appendUserMessageWithFile(msg.text, msg.fileName, msg.fileSize, false);
+                        } else {
+                            appendMessage('user', msg.text, false);
+                        }
+                    } else {
+                        appendMessage('ai', msg.text, false);
+                    }
                 });
             }
         }
@@ -1611,12 +1751,12 @@
             const welcomeDiv = document.createElement('div');
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
-                <h3>TRION</h3>
-                <p>Pregúntame lo que necesites</p>
+                <h3>TRION AI</h3>
+                <p>Pregúntame lo que necesites. Puedo leer imágenes y archivos.</p>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
+                    <span><i class="fas fa-bolt"></i> Rápido: Respuestas concisas</span>
                     <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
-                    <span><i class="fas fa-crown"></i> Pro: Detallado</span>
+                    <span><i class="fas fa-crown"></i> Pro: Análisis profundo</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1635,12 +1775,22 @@
             if (role === 'ai') {
                 const header = document.createElement('div');
                 header.classList.add('message-header');
+                
                 const logoImg = document.createElement('img');
                 logoImg.src = 'logo.png';
-                logoImg.onerror = function() { this.style.display = 'none'; };
-                header.appendChild(logoImg);
+                logoImg.alt = 'TRION';
+                logoImg.onerror = function() {
+                    this.style.display = 'none';
+                    const fallback = document.createElement('i');
+                    fallback.className = 'fas fa-brain';
+                    header.insertBefore(fallback, this);
+                    this.remove();
+                };
+                
                 const span = document.createElement('span');
                 span.textContent = 'TRION';
+                
+                header.appendChild(logoImg);
                 header.appendChild(span);
                 msgDiv.appendChild(header);
             }
@@ -1657,35 +1807,60 @@
         function appendUserMessageWithImage(text, base64Data, mimeType, shouldSave = true) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message', 'user');
-            if (text) {
+            
+            if (text && text.trim()) {
                 const contentDiv = document.createElement('div');
                 contentDiv.textContent = text;
                 msgDiv.appendChild(contentDiv);
             }
+            
             const img = document.createElement('img');
             img.src = `data:${mimeType};base64,${base64Data}`;
             img.classList.add('message-image-preview');
+            img.alt = 'Imagen adjunta';
             msgDiv.appendChild(img);
+            
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
-            if (shouldSave) saveMessage('user', text, { imageData: base64Data, mime: mimeType });
+            
+            if (shouldSave) {
+                saveMessage('user', text, { 
+                    imageData: base64Data, 
+                    mime: mimeType 
+                });
+            }
         }
 
         function appendUserMessageWithFile(text, fileName, fileSize, shouldSave = true) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message', 'user');
-            if (text) {
+            
+            if (text && text.trim()) {
                 const contentDiv = document.createElement('div');
                 contentDiv.textContent = text;
                 msgDiv.appendChild(contentDiv);
             }
+            
             const fileDiv = document.createElement('div');
             fileDiv.className = 'message-file-preview';
-            fileDiv.innerHTML = `<i class="fas fa-file-alt"></i><div><div>${fileName}</div><div style="font-size:0.7rem;">${fileSize}</div></div>`;
+            fileDiv.innerHTML = `
+                <i class="fas fa-file-alt"></i>
+                <div>
+                    <div style="font-weight:500;">${fileName}</div>
+                    <div style="font-size:0.7rem; color:var(--text-secondary);">${fileSize}</div>
+                </div>
+            `;
             msgDiv.appendChild(fileDiv);
+            
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
-            if (shouldSave) saveMessage('user', text, { fileName, fileSize });
+            
+            if (shouldSave) {
+                saveMessage('user', text, { 
+                    fileName: fileName, 
+                    fileSize: fileSize 
+                });
+            }
         }
 
         function showThinkingMessage() {
@@ -1709,12 +1884,19 @@
 
         async function sendMessage(isVoice = false) {
             const prompt = userInput.value.trim();
-            if (!prompt && !currentImageBase64 && !currentFile) return;
+            
+            if (!prompt && !currentImageBase64 && !currentFile) {
+                if (isVoice) {
+                    userInput.value = '';
+                }
+                return;
+            }
 
             if (document.querySelector('.welcome-message')) {
                 document.querySelector('.welcome-message').remove();
             }
 
+            // Mostrar mensaje del usuario
             if (currentImageBase64) {
                 appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime, true);
             } else if (currentFile) {
@@ -1736,9 +1918,16 @@
 
             try {
                 const history = chats[currentChatId] || [];
-                let messages = [{ role: "system", content: getActiveSystemPrompt() }];
+                let messages = [
+                    { 
+                        role: "system", 
+                        content: getActiveSystemPrompt() 
+                    }
+                ];
                 
-                for (let msg of history) {
+                // Añadir historial reciente (últimos 10 mensajes para no exceder tokens)
+                const recentHistory = history.slice(-10);
+                for (let msg of recentHistory) {
                     if (msg.role === 'user' && !msg.imageData && !msg.fileData) {
                         messages.push({ role: "user", content: msg.text });
                     } else if (msg.role === 'ai') {
@@ -1746,18 +1935,37 @@
                     }
                 }
 
+                // Construir contenido del usuario
                 let userContent = [];
-                if (prompt) userContent.push({ type: "text", text: prompt });
-                else if (imageToSend) userContent.push({ type: "text", text: "Describe esta imagen." });
-                else if (fileToSend) userContent.push({ type: "text", text: `Archivo: ${fileToSend.name}\n\n${fileContentToSend}` });
-
+                
+                if (prompt) {
+                    userContent.push({ type: "text", text: prompt });
+                }
+                
                 if (imageToSend) {
-                    userContent.push({ type: "image_url", image_url: { url: `data:${mimeToSend};base64,${imageToSend}` } });
+                    userContent.push({ 
+                        type: "image_url", 
+                        image_url: { 
+                            url: `data:${mimeToSend};base64,${imageToSend}` 
+                        } 
+                    });
+                }
+                
+                if (fileToSend && fileContentToSend) {
+                    userContent.push({ 
+                        type: "text", 
+                        text: `Archivo adjunto: ${fileToSend.name}\n\nContenido:\n${fileContentToSend}` 
+                    });
                 }
 
-                messages.push({ role: "user", content: userContent });
+                messages.push({ 
+                    role: "user", 
+                    content: userContent.length === 1 ? userContent[0].text : userContent 
+                });
 
+                // Configurar temperatura según modo
                 const temperature = currentMode === 'rapido' ? 0.3 : currentMode === 'pro' ? 0.8 : 0.6;
+                const maxTokens = currentMode === 'pro' ? 4096 : 2048;
 
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -1766,40 +1974,65 @@
                         'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: MODEL_NAME,
+                        model: getActiveModel(),
                         messages: messages,
-                        max_tokens: currentMode === 'pro' ? 4096 : 2048,
+                        max_tokens: maxTokens,
                         temperature: temperature
                     })
                 });
 
-                thinkingMsg.remove();
-                
-                if (!response.ok) throw new Error();
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    throw new Error(`Error ${response.status}: ${errorData}`);
+                }
                 
                 const data = await response.json();
-                let aiResponse = data.choices[0].message.content.replace(/[*]/g, '').trim();
                 
+                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                    throw new Error('Respuesta inválida de la API');
+                }
+                
+                let aiResponse = data.choices[0].message.content;
+                aiResponse = aiResponse.replace(/[*]/g, '').trim();
+
+                thinkingMsg.remove();
                 appendMessage('ai', aiResponse, true);
 
+                // Responder por voz si la llamada está activa
                 if (isCallActive) {
                     autoRestartRecognition = false;
                     await speakText(aiResponse);
                     setTimeout(() => {
                         autoRestartRecognition = true;
-                        if (isCallActive && recognition) recognition.start();
+                        if (isCallActive && recognition) {
+                            try { recognition.start(); } catch (e) {}
+                        }
                     }, 500);
                 }
                 
             } catch (error) {
+                console.error('Error:', error);
                 thinkingMsg.remove();
-                appendMessage('ai', 'Error', true);
+                
+                let errorMessage = 'Lo siento, hubo un error';
+                if (error.message.includes('401')) {
+                    errorMessage = 'Error de autenticación con la API';
+                } else if (error.message.includes('429')) {
+                    errorMessage = 'Demasiadas peticiones. Espera un momento';
+                } else if (error.message.includes('500')) {
+                    errorMessage = 'Error del servidor. Intenta de nuevo';
+                }
+                
+                appendMessage('ai', errorMessage, true);
+                
                 if (isCallActive) {
                     autoRestartRecognition = false;
-                    await speakText('Lo siento, hubo un error');
+                    await speakText(errorMessage);
                     setTimeout(() => {
                         autoRestartRecognition = true;
-                        if (isCallActive && recognition) recognition.start();
+                        if (isCallActive && recognition) {
+                            try { recognition.start(); } catch (e) {}
+                        }
                     }, 500);
                 }
             }
