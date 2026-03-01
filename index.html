@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Mismo CSS que tenías antes */
         * {
             margin: 0;
             padding: 0;
@@ -190,11 +191,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+        }
+
+        .sidebar-logo img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
         }
 
         .sidebar-logo i {
             font-size: 24px;
             color: white;
+            display: none;
         }
 
         .sidebar-header h2 {
@@ -388,11 +398,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
         }
 
         .logo i {
             font-size: 28px;
             color: white;
+            display: none;
         }
 
         .brand h1 {
@@ -597,9 +616,17 @@
             margin-bottom: 8px;
         }
 
+        .ai .message-header img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
         .ai .message-header i {
             font-size: 16px;
             color: var(--accent-secondary);
+            display: none;
         }
 
         .ai .message-header span {
@@ -777,6 +804,8 @@
             color: var(--accent-secondary);
             margin-top: 5px;
             font-style: italic;
+            align-self: flex-start;
+            margin-left: 10px;
         }
 
         .voice-indicator {
@@ -913,8 +942,9 @@
                 height: 40px;
             }
 
-            .logo i {
-                font-size: 24px;
+            .logo img {
+                width: 24px;
+                height: 24px;
             }
 
             #status {
@@ -1026,7 +1056,7 @@
 <div class="splash-screen" id="splashScreen">
     <div class="splash-content">
         <div class="splash-logo">
-            <i class="fas fa-brain"></i>
+            <img src="logo.png" alt="TRION" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
         </div>
         <h1 class="splash-title">TRION</h1>
         <div class="splash-version">v2.0</div>
@@ -1042,7 +1072,7 @@
     <div class="chat-sidebar" id="chatSidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <i class="fas fa-brain"></i>
+                <img src="logo.png" alt="TRION" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
             </div>
             <h2>Historial</h2>
             <button class="new-chat-btn" onclick="createNewChat()">
@@ -1071,7 +1101,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo">
-                    <i class="fas fa-brain"></i>
+                    <img src="logo.png" alt="TRION" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
                 </div>
                 <h1>TRION</h1>
                 <span id="status"><i class="fas fa-circle"></i> NORMAL</span>
@@ -1151,15 +1181,17 @@
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         const MAIN_MODEL = 'llama-3.3-70b-versatile';
 
-        // APIs de búsqueda mejoradas
-        const DUCKDUCKGO_API = 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1';
+        // APIs de búsqueda REAL
         const WIKIPEDIA_API = 'https://es.wikipedia.org/api/rest_v1/page/summary/';
         const SEARCH_WIKI = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=%s&format=json&origin=*';
+        
+        // API de DuckDuckGo para búsquedas generales
+        const DUCKDUCKGO_API = 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1';
 
         const PROMPTS = {
-            rapido: "Eres Trion v2.0, un asistente AI con CONOCIMIENTO ACTUALIZADO DE INTERNET. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: Usa SIEMPRE la información de búsqueda proporcionada para responder. Si no hay información de búsqueda, di que no tienes información actualizada. Responde de forma MUY CONCISA, máximo 2-3 frases. Tono profesional y directo.",
-            normal: "Eres Trion v2.0, un asistente AI con CONOCIMIENTO ACTUALIZADO DE INTERNET. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: Usa SIEMPRE la información de búsqueda proporcionada. No uses conocimiento propio, solo la información de búsqueda. Responde de forma clara y útil basándote en los resultados. Tono profesional.",
-            pro: "Eres Trion v2.0, un asistente AI con CONOCIMIENTO ACTUALIZADO DE INTERNET. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: Usa EXCLUSIVAMENTE la información de búsqueda proporcionada. Da respuestas DETALLADAS y bien estructuradas basadas en los resultados. Explica conceptos a fondo usando la información encontrada.",
+            rapido: "Eres Trion v2.0, un asistente AI. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: La siguiente información entre [SEARCH_RESULTS] es lo ÚNICO que debes usar para responder. NO uses tu conocimiento interno. Responde de forma MUY CONCISA en español, máximo 2-3 frases. Si no hay resultados de búsqueda, di que no tienes información actualizada.",
+            normal: "Eres Trion v2.0, un asistente AI. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: La siguiente información entre [SEARCH_RESULTS] es lo ÚNICO que debes usar para responder. NO uses tu conocimiento interno. Responde de forma clara y útil en español basándote SOLO en estos resultados.",
+            pro: "Eres Trion v2.0, un asistente AI. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: La siguiente información entre [SEARCH_RESULTS] es lo ÚNICO que debes usar para responder. NO uses tu conocimiento interno. Da respuestas DETALLADAS y bien estructuradas en español basándote EXCLUSIVAMENTE en esta información.",
             vision: "Eres TRION VISION v2.0, un asistente AI que analiza imágenes. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Cuando recibas una imagen: 1) Describe lo que ves 2) Responde preguntas sobre la imagen. No uses internet para imágenes, solo describe lo que ves. Responde SIEMPRE en español."
         };
 
@@ -1183,43 +1215,148 @@
         let currentImageMime = null;
         let chats = {};
         let currentChatId = 'default';
-        let conversationMemory = [];
-        let searchCache = new Map();
+        let conversationHistory = [];
 
-        // Sistema de memoria mejorado - guarda contexto de conversación
-        function updateConversationMemory(role, content) {
-            conversationMemory.push({ role, content, timestamp: Date.now() });
-            if (conversationMemory.length > 20) {
-                conversationMemory = conversationMemory.slice(-20);
-            }
-            // Guardar en localStorage para persistencia
-            localStorage.setItem('trion_memory_' + currentChatId, JSON.stringify(conversationMemory));
-        }
-
-        function loadConversationMemory() {
+        // Cargar chats
+        function loadChats() {
             try {
-                const saved = localStorage.getItem('trion_memory_' + currentChatId);
-                if (saved) {
-                    conversationMemory = JSON.parse(saved);
-                } else {
-                    conversationMemory = [];
-                }
+                const saved = localStorage.getItem('trion_chats_v2');
+                chats = saved ? JSON.parse(saved) : { default: [] };
+                if (!chats[currentChatId]) currentChatId = 'default';
+                loadHistory();
+                updateSidebar();
             } catch (e) {
-                conversationMemory = [];
+                chats = { default: [] };
             }
         }
 
-        // Búsqueda en internet REAL
-        async function searchInternet(query) {
-            const cacheKey = query.toLowerCase().trim();
-            if (searchCache.has(cacheKey)) {
-                console.log('Usando caché para:', query);
-                return searchCache.get(cacheKey);
-            }
+        function saveChats() {
+            localStorage.setItem('trion_chats_v2', JSON.stringify(chats));
+        }
 
-            statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET...';
+        function loadHistory() {
+            const history = chats[currentChatId] || [];
+            chatBox.innerHTML = '';
+            if (history.length === 0) {
+                showWelcomeMessage();
+            } else {
+                history.forEach(msg => {
+                    if (msg.role === 'user') {
+                        if (msg.imageData) {
+                            appendUserMessageWithImage(msg.text, msg.imageData, msg.mime, false);
+                        } else {
+                            appendMessage('user', msg.text, false);
+                        }
+                    } else {
+                        appendMessage('ai', msg.text, false);
+                    }
+                });
+            }
+        }
+
+        function showWelcomeMessage() {
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.classList.add('welcome-message');
+            welcomeDiv.innerHTML = `
+                <h3>TRION v2.0</h3>
+                <p>Asistente con búsqueda en internet real</p>
+                <div class="version-badge">v2.0</div>
+                <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
+                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
+                    <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
+                    <span><i class="fas fa-crown"></i> Pro: Detallado</span>
+                    <span><i class="fas fa-eye" style="color:#10b981;"></i> Visión: Imágenes</span>
+                </span>
+            `;
+            chatBox.appendChild(welcomeDiv);
+        }
+
+        function appendMessage(role, text, shouldSave = true) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', role);
             
+            if (role === 'ai') {
+                const header = document.createElement('div');
+                header.classList.add('message-header');
+                
+                const logoImg = document.createElement('img');
+                logoImg.src = 'logo.png';
+                logoImg.alt = 'TRION';
+                logoImg.onerror = function() {
+                    this.style.display = 'none';
+                    const fallback = document.createElement('i');
+                    fallback.className = 'fas fa-brain';
+                    header.insertBefore(fallback, this);
+                    this.remove();
+                };
+                
+                const span = document.createElement('span');
+                span.textContent = currentMode === 'vision' ? 'TRION VISION v2.0' : 'TRION v2.0';
+                if (currentMode === 'vision') {
+                    span.style.color = '#10b981';
+                }
+                
+                header.appendChild(logoImg);
+                header.appendChild(span);
+                msgDiv.appendChild(header);
+            }
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = text.replace(/\n/g, '<br>');
+            msgDiv.appendChild(contentDiv);
+            
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            if (shouldSave) {
+                if (!chats[currentChatId]) chats[currentChatId] = [];
+                chats[currentChatId].push({ role, text });
+                saveChats();
+            }
+        }
+
+        function appendUserMessageWithImage(text, base64Data, mimeType, shouldSave = true) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', 'user');
+            
+            if (text && text.trim()) {
+                const contentDiv = document.createElement('div');
+                contentDiv.textContent = text;
+                msgDiv.appendChild(contentDiv);
+            }
+            
+            const img = document.createElement('img');
+            img.src = `data:${mimeType};base64,${base64Data}`;
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '200px';
+            img.style.borderRadius = '12px';
+            img.style.marginTop = '10px';
+            msgDiv.appendChild(img);
+            
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            if (shouldSave) {
+                if (!chats[currentChatId]) chats[currentChatId] = [];
+                chats[currentChatId].push({ role: 'user', text, imageData: base64Data, mime: mimeType });
+                saveChats();
+            }
+        }
+
+        function showThinkingMessage() {
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.classList.add('thinking');
+            thinkingDiv.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div>';
+            chatBox.appendChild(thinkingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return thinkingDiv;
+        }
+
+        // BÚSQUEDA EN INTERNET REAL
+        async function searchInternet(query) {
             try {
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET...';
+                
                 // 1. Buscar en Wikipedia primero
                 const searchUrl = SEARCH_WIKI.replace('%s', encodeURIComponent(query));
                 const searchResponse = await fetch(searchUrl);
@@ -1233,80 +1370,57 @@
                         if (pageResponse.ok) {
                             const pageData = await pageResponse.json();
                             if (pageData.extract) {
-                                const result = {
+                                return {
                                     source: 'Wikipedia',
                                     content: pageData.extract,
                                     title: pageData.title,
                                     url: pageData.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${encodeURIComponent(firstTitle)}`
                                 };
-                                searchCache.set(cacheKey, result);
-                                return result;
                             }
                         }
                     }
                 }
 
-                // 2. Intentar DuckDuckGo
+                // 2. Intentar DuckDuckGo como respaldo
                 const ddgUrl = DUCKDUCKGO_API.replace('%s', encodeURIComponent(query));
                 const ddgResponse = await fetch(ddgUrl);
                 
                 if (ddgResponse.ok) {
                     const ddgData = await ddgResponse.json();
-                    
-                    // AbstractText es la mejor opción
                     if (ddgData.AbstractText) {
-                        const result = {
+                        return {
                             source: 'DuckDuckGo',
                             content: ddgData.AbstractText,
                             title: ddgData.Heading || query,
                             url: ddgData.AbstractURL || ''
                         };
-                        searchCache.set(cacheKey, result);
-                        return result;
-                    }
-                    
-                    // Si no hay Abstract, buscar en RelatedTopics
-                    if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
+                    } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
                         let content = '';
                         for (let i = 0; i < Math.min(3, ddgData.RelatedTopics.length); i++) {
                             const topic = ddgData.RelatedTopics[i];
                             if (topic.Text) {
-                                content += topic.Text + '\n';
+                                content += topic.Text + '\n\n';
                             }
                         }
                         if (content) {
-                            const result = {
+                            return {
                                 source: 'DuckDuckGo',
                                 content: content,
                                 title: query,
                                 url: ''
                             };
-                            searchCache.set(cacheKey, result);
-                            return result;
                         }
                     }
                 }
 
-                // 3. Si no se encuentra nada
-                return {
-                    source: 'Sin resultados',
-                    content: 'No se encontró información actualizada sobre esta consulta.',
-                    title: query,
-                    url: ''
-                };
+                return null;
                 
             } catch (error) {
                 console.error('Error en búsqueda:', error);
-                return {
-                    source: 'Error',
-                    content: 'Error al buscar información en internet.',
-                    title: query,
-                    url: ''
-                };
+                return null;
             }
         }
 
-        // Función para procesar la respuesta
         async function sendMessage() {
             const prompt = userInput.value.trim();
             
@@ -1314,7 +1428,6 @@
                 return;
             }
 
-            // Eliminar mensaje de bienvenida si existe
             if (document.querySelector('.welcome-message')) {
                 document.querySelector('.welcome-message').remove();
             }
@@ -1328,39 +1441,49 @@
 
             const imageToSend = currentImageBase64;
             const mimeToSend = currentImageMime;
+            userInput.value = '';
             removeFile();
 
             const thinkingMsg = showThinkingMessage();
 
             try {
                 let searchResult = null;
+                let searchContext = '';
                 
-                // Solo buscar en internet si no es modo visión o si es modo visión sin imagen
+                // Buscar en internet si no es modo visión o si no hay imagen
                 if (currentMode !== 'vision' || !imageToSend) {
                     searchResult = await searchInternet(prompt);
                     
-                    // Mostrar fuente en status
-                    if (searchResult && searchResult.source !== 'Sin resultados' && searchResult.source !== 'Error') {
-                        statusDiv.innerHTML = `<i class="fas fa-circle"></i> FUENTE: ${searchResult.source}`;
+                    if (searchResult) {
+                        searchContext = `\n\n[SEARCH RESULTS - ${new Date().toLocaleString()}]\n`;
+                        searchContext += `Fuente: ${searchResult.source}\n`;
+                        searchContext += `Título: ${searchResult.title}\n`;
+                        searchContext += `Contenido:\n${searchResult.content}\n`;
+                        searchContext += `[/SEARCH RESULTS]\n\n`;
+                        searchContext += `INSTRUCCIÓN: Usa SOLO la información de arriba para responder. NO inventes nada.`;
+                        
+                        statusDiv.innerHTML = `<i class="fas fa-circle"></i> ${searchResult.source.toUpperCase()}`;
+                    } else {
+                        searchContext = `\n\n[SEARCH RESULTS]\nNo se encontró información actualizada sobre: "${prompt}"\n[/SEARCH RESULTS]\n\n`;
+                        searchContext += `INSTRUCCIÓN: Responde que no tienes información actualizada sobre este tema.`;
+                        statusDiv.innerHTML = '<i class="fas fa-circle"></i> SIN RESULTADOS';
                     }
                 }
 
-                // Cargar memoria de la conversación
-                loadConversationMemory();
-
-                // Construir mensajes con memoria
+                // Construir mensajes con historial
                 let messages = [{ 
                     role: "system", 
-                    content: PROMPTS[currentMode] + (searchResult ? 
-                        `\n\nINFORMACIÓN ACTUAL DE INTERNET (${new Date().toLocaleString()}):\nFuente: ${searchResult.source}\nTítulo: ${searchResult.title}\nContenido: ${searchResult.content}` : 
-                        (currentMode !== 'vision' ? '\n\nNo se encontró información actualizada en internet.' : ''))
+                    content: PROMPTS[currentMode] + searchContext
                 }];
 
-                // Añadir memoria de conversación (últimos 10 mensajes)
-                const recentMemory = conversationMemory.slice(-10);
-                for (let msg of recentMemory) {
-                    if (msg.role === 'user' || msg.role === 'assistant') {
-                        messages.push({ role: msg.role, content: msg.content });
+                // Añadir historial reciente (últimos 10 mensajes)
+                const history = chats[currentChatId] || [];
+                const recentHistory = history.slice(-10);
+                for (let msg of recentHistory) {
+                    if (msg.role === 'user' && !msg.imageData) {
+                        messages.push({ role: "user", content: msg.text });
+                    } else if (msg.role === 'ai') {
+                        messages.push({ role: "assistant", content: msg.text });
                     }
                 }
 
@@ -1411,23 +1534,17 @@
                 }
                 
                 let aiResponse = data.choices[0].message.content;
-                
-                // Limpiar formato
                 aiResponse = aiResponse.replace(/[*]/g, '').trim();
 
                 thinkingMsg.remove();
                 appendMessage('ai', aiResponse);
 
-                // Guardar en memoria
-                updateConversationMemory('user', prompt);
-                updateConversationMemory('assistant', aiResponse);
-
-                // Si hay fuente, añadir nota
-                if (searchResult && searchResult.source !== 'Sin resultados' && searchResult.source !== 'Error' && currentMode !== 'vision') {
-                    const sourceNote = document.createElement('div');
-                    sourceNote.className = 'search-info';
-                    sourceNote.innerHTML = `Fuente: ${searchResult.source} · ${new Date().toLocaleTimeString()}`;
-                    chatBox.appendChild(sourceNote);
+                // Mostrar fuente si existe
+                if (searchResult && currentMode !== 'vision') {
+                    const sourceDiv = document.createElement('div');
+                    sourceDiv.className = 'search-info';
+                    sourceDiv.innerHTML = `📚 Fuente: ${searchResult.source} · ${new Date().toLocaleTimeString()}`;
+                    chatBox.appendChild(sourceDiv);
                     chatBox.scrollTop = chatBox.scrollHeight;
                 }
 
@@ -1435,176 +1552,88 @@
                 console.error('Error:', error);
                 thinkingMsg.remove();
                 
-                let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
+                let errorMessage = 'Lo siento, hubo un error al procesar tu solicitud.';
                 if (currentMode === 'vision') {
-                    errorMessage = '👁️ Error al procesar la imagen. Por favor, intenta de nuevo.';
+                    errorMessage = '👁️ Error al procesar la imagen. Intenta de nuevo.';
                 }
                 
                 appendMessage('ai', errorMessage);
             } finally {
-                userInput.value = '';
                 updateModeUI();
             }
         }
 
-        // Funciones auxiliares
-        function appendMessage(role, text) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', role);
+        function removeFile() {
+            currentImageBase64 = null;
+            currentImageMime = null;
+            imageUpload.value = '';
+            fileInfo.style.display = 'none';
+        }
+        window.removeFile = removeFile;
+
+        async function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        imageUpload.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
             
-            if (role === 'ai') {
-                const header = document.createElement('div');
-                header.classList.add('message-header');
-                
-                const icon = document.createElement('i');
-                icon.className = 'fas fa-brain';
-                
-                const span = document.createElement('span');
-                span.textContent = currentMode === 'vision' ? 'TRION VISION v2.0' : 'TRION v2.0';
-                if (currentMode === 'vision') {
-                    span.style.color = '#10b981';
-                }
-                
-                header.appendChild(icon);
-                header.appendChild(span);
-                msgDiv.appendChild(header);
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor selecciona una imagen válida');
+                imageUpload.value = '';
+                return;
             }
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.innerHTML = text.replace(/\n/g, '<br>');
-            msgDiv.appendChild(contentDiv);
-            
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            // Guardar en chats
-            if (!chats[currentChatId]) chats[currentChatId] = [];
-            chats[currentChatId].push({ role, text });
-            saveChats();
-        }
 
-        function appendUserMessageWithImage(text, base64Data, mimeType) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', 'user');
+            removeFile();
             
-            if (text && text.trim()) {
-                const contentDiv = document.createElement('div');
-                contentDiv.textContent = text;
-                msgDiv.appendChild(contentDiv);
-            }
-            
-            const img = document.createElement('img');
-            img.src = `data:${mimeType};base64,${base64Data}`;
-            img.style.maxWidth = '200px';
-            img.style.maxHeight = '200px';
-            img.style.borderRadius = '12px';
-            img.style.marginTop = '10px';
-            msgDiv.appendChild(img);
-            
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            // Guardar en chats
-            if (!chats[currentChatId]) chats[currentChatId] = [];
-            chats[currentChatId].push({ role: 'user', text, imageData: base64Data, mime: mimeType });
-            saveChats();
-        }
-
-        function showThinkingMessage() {
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.classList.add('thinking');
-            thinkingDiv.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div>';
-            chatBox.appendChild(thinkingDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return thinkingDiv;
-        }
-
-        function saveChats() {
-            localStorage.setItem('trion_chats_v2', JSON.stringify(chats));
-        }
-
-        function loadChats() {
             try {
-                const saved = localStorage.getItem('trion_chats_v2');
-                chats = saved ? JSON.parse(saved) : { default: [] };
-                if (!chats[currentChatId]) currentChatId = 'default';
-                loadHistory();
-                updateSidebar();
-            } catch (e) {
-                chats = { default: [] };
+                currentImageBase64 = await readFileAsBase64(file);
+                currentImageMime = file.type;
+                fileName.textContent = `📷 ${file.name}`;
+                fileInfo.style.display = 'flex';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: IMAGEN LISTA';
+            } catch (error) {
+                alert('Error al leer la imagen');
+                imageUpload.value = '';
             }
-        }
+        });
 
-        function loadHistory() {
-            const history = chats[currentChatId] || [];
-            chatBox.innerHTML = '';
-            if (history.length === 0) {
-                showWelcomeMessage();
+        function updateModeUI() {
+            document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
+            
+            if (currentMode === 'rapido') {
+                rapidMode.classList.add('active');
+                selectedModeSpan.textContent = 'Rápido';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
+                fileButtons.style.display = 'none';
+                removeFile();
+            } else if (currentMode === 'pro') {
+                proMode.classList.add('active');
+                selectedModeSpan.textContent = 'Pro';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
+                fileButtons.style.display = 'none';
+                removeFile();
+            } else if (currentMode === 'vision') {
+                visionMode.classList.add('active');
+                selectedModeSpan.textContent = 'TRION VISION';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN';
+                fileButtons.style.display = 'flex';
             } else {
-                history.forEach(msg => {
-                    if (msg.role === 'user') {
-                        if (msg.imageData) {
-                            const msgDiv = document.createElement('div');
-                            msgDiv.classList.add('message', 'user');
-                            if (msg.text) {
-                                const contentDiv = document.createElement('div');
-                                contentDiv.textContent = msg.text;
-                                msgDiv.appendChild(contentDiv);
-                            }
-                            const img = document.createElement('img');
-                            img.src = `data:${msg.mime};base64,${msg.imageData}`;
-                            img.style.maxWidth = '200px';
-                            img.style.maxHeight = '200px';
-                            img.style.borderRadius = '12px';
-                            img.style.marginTop = '10px';
-                            msgDiv.appendChild(img);
-                            chatBox.appendChild(msgDiv);
-                        } else {
-                            appendMessage('user', msg.text, false);
-                        }
-                    } else {
-                        const msgDiv = document.createElement('div');
-                        msgDiv.classList.add('message', 'ai');
-                        
-                        const header = document.createElement('div');
-                        header.classList.add('message-header');
-                        
-                        const icon = document.createElement('i');
-                        icon.className = 'fas fa-brain';
-                        
-                        const span = document.createElement('span');
-                        span.textContent = 'TRION v2.0';
-                        
-                        header.appendChild(icon);
-                        header.appendChild(span);
-                        msgDiv.appendChild(header);
-                        
-                        const contentDiv = document.createElement('div');
-                        contentDiv.innerHTML = msg.text.replace(/\n/g, '<br>');
-                        msgDiv.appendChild(contentDiv);
-                        
-                        chatBox.appendChild(msgDiv);
-                    }
-                });
-                chatBox.scrollTop = chatBox.scrollHeight;
+                normalMode.classList.add('active');
+                selectedModeSpan.textContent = 'Normal';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> NORMAL';
+                fileButtons.style.display = 'none';
+                removeFile();
             }
-        }
-
-        function showWelcomeMessage() {
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.classList.add('welcome-message');
-            welcomeDiv.innerHTML = `
-                <h3>TRION v2.0</h3>
-                <p>Asistente con búsqueda en internet real y memoria</p>
-                <div class="version-badge">v2.0</div>
-                <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: Conciso, solo internet</span>
-                    <span><i class="fas fa-robot"></i> Normal: Equilibrado, internet</span>
-                    <span><i class="fas fa-crown"></i> Pro: Detallado, internet</span>
-                    <span><i class="fas fa-eye" style="color:#10b981;"></i> Visión: Análisis de imágenes</span>
-                </span>
-            `;
-            chatBox.appendChild(welcomeDiv);
         }
 
         function updateSidebar() {
@@ -1643,7 +1672,6 @@
             if (Object.keys(chats).length === 1) return;
             
             delete chats[chatId];
-            localStorage.removeItem('trion_memory_' + chatId);
             if (currentChatId === chatId) {
                 currentChatId = Object.keys(chats)[0];
                 loadHistory();
@@ -1687,7 +1715,6 @@
             if (confirm('¿Eliminar todos los chats?')) {
                 chats = { default: [] };
                 currentChatId = 'default';
-                localStorage.removeItem('trion_memory_default');
                 saveChats();
                 loadHistory();
                 updateSidebar();
@@ -1700,83 +1727,11 @@
 
         window.clearChat = function() {
             chats[currentChatId] = [];
-            localStorage.removeItem('trion_memory_' + currentChatId);
             saveChats();
             loadHistory();
             updateSidebar();
-        };
-
-        function removeFile() {
-            currentImageBase64 = null;
-            currentImageMime = null;
-            imageUpload.value = '';
-            fileInfo.style.display = 'none';
-        }
-        window.removeFile = removeFile;
-
-        async function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        imageUpload.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            if (!file.type.startsWith('image/')) {
-                alert('Por favor selecciona una imagen válida');
-                imageUpload.value = '';
-                return;
-            }
-
             removeFile();
-            
-            try {
-                currentImageBase64 = await readFileAsBase64(file);
-                currentImageMime = file.type;
-                fileName.textContent = `📷 ${file.name}`;
-                fileInfo.style.display = 'flex';
-            } catch (error) {
-                alert('Error al leer la imagen');
-                imageUpload.value = '';
-            }
-        });
-
-        function updateModeUI() {
-            document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
-            
-            if (currentMode === 'rapido') {
-                rapidMode.classList.add('active');
-                selectedModeSpan.textContent = 'Rápido';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
-                fileButtons.style.display = 'none';
-                removeFile();
-            } else if (currentMode === 'pro') {
-                proMode.classList.add('active');
-                selectedModeSpan.textContent = 'Pro';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
-                fileButtons.style.display = 'none';
-                removeFile();
-            } else if (currentMode === 'vision') {
-                visionMode.classList.add('active');
-                selectedModeSpan.textContent = 'TRION VISION';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN';
-                fileButtons.style.display = 'flex';
-            } else {
-                normalMode.classList.add('active');
-                selectedModeSpan.textContent = 'Normal';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> NORMAL';
-                fileButtons.style.display = 'none';
-                removeFile();
-            }
-        }
+        };
 
         rapidMode.addEventListener('click', () => { currentMode = 'rapido'; updateModeUI(); });
         normalMode.addEventListener('click', () => { currentMode = 'normal'; updateModeUI(); });
@@ -1790,6 +1745,31 @@
                 sendMessage();
             }
         });
+
+        // Voice (simplificado)
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'es-ES';
+
+            callButton.addEventListener('click', () => {
+                recognition.start();
+                callButton.classList.add('listening');
+                callButton.innerHTML = '<i class="fas fa-microphone"></i>';
+            });
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                userInput.value = transcript;
+                sendMessage();
+            };
+
+            recognition.onend = () => {
+                callButton.classList.remove('listening');
+                callButton.innerHTML = '<i class="fas fa-phone"></i>';
+            };
+        }
 
         // PWA
         let deferredPrompt;
@@ -1817,7 +1797,7 @@
         loadChats();
         updateModeUI();
 
-        // Cerrar sidebar al hacer click fuera en móvil
+        // Cerrar sidebar
         document.addEventListener('click', function(e) {
             const sidebar = document.getElementById('chatSidebar');
             const menuToggle = document.getElementById('menuToggle');
