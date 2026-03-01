@@ -1270,22 +1270,18 @@
             document.getElementById('splashScreen').classList.add('fade-out');
         }, 2000);
 
-        // ===== CONFIGURACIÓN ACTUALIZADA =====
+        // ===== CONFIGURACIÓN ACTUALIZADA 2026 =====
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         
-        // MODELOS ACTUALIZADOS (2024-2025)
-        const MODELS = {
-            rapido: 'llama-3.3-70b-versatile',        // Modelo rápido (2024)
-            normal: 'llama-3.3-70b-versatile',        // Modelo equilibrado
-            pro: 'mixtral-8x7b-32768'                 // Modelo más potente para respuestas largas
-        };
+        // MODELO RECOMENDADO - EL MEJOR DE 2026
+        const BEST_MODEL = 'llama-3.3-70b-versatile';  // 208 tok/s, mejor calidad/precio [citation:1][citation:2]
 
-        // System prompts mejorados
+        // System prompts optimizados
         const PROMPTS = {
-            rapido: "Eres Trion, un asistente AI creado por Hugo Tribaldos. Responde de forma MUY CONCISA, máximo 2-3 frases. Ve directo al punto. Tono amable pero profesional. No uses emojis ni asteriscos.",
-            normal: "Eres Trion, un asistente AI creado por Hugo Tribaldos. Responde de forma clara y útil, con explicaciones equilibradas. Tono profesional y moderno. No uses emojis ni asteriscos.",
-            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Proporciona respuestas DETALLADAS y PROFUNDAS. Explica conceptos a fondo, da ejemplos cuando sea útil. Mantén un tono conversacional pero profesional. No uses emojis ni asteriscos."
+            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Responde de forma MUY CONCISA, máximo 2-3 frases. Ve directo al punto. Tono profesional.",
+            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Responde de forma clara y útil, con explicaciones equilibradas. Tono profesional.",
+            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Proporciona respuestas DETALLADAS y PROFUNDAS. Explica conceptos a fondo, da ejemplos cuando sea útil."
         };
 
         const chatBox = document.getElementById('chat-box');
@@ -1478,21 +1474,8 @@
             return new Promise((resolve) => {
                 const voices = speechSynthesis.getVoices();
                 if (voices.length > 0) {
-                    // Buscar voces premium/neurales en español
-                    const premiumVoices = voices.filter(v => 
-                        v.lang.includes('es') && 
-                        (v.name.includes('Premium') || v.name.includes('Neural') || v.name.includes('Enhanced'))
-                    );
-                    
                     const spanishVoices = voices.filter(v => v.lang.includes('es'));
-                    
-                    if (premiumVoices.length > 0) {
-                        resolve(premiumVoices[0]);
-                    } else if (spanishVoices.length > 0) {
-                        resolve(spanishVoices[0]);
-                    } else {
-                        resolve(voices[0]);
-                    }
+                    resolve(spanishVoices[0] || voices[0]);
                 } else {
                     resolve(null);
                 }
@@ -1606,10 +1589,6 @@
             }
         }
 
-        function getActiveModel() {
-            return MODELS[currentMode] || MODELS.normal;
-        }
-
         function getActiveSystemPrompt() {
             return PROMPTS[currentMode];
         }
@@ -1703,15 +1682,6 @@
                 return;
             }
 
-            // Extensiones permitidas
-            const allowedExtensions = ['.txt', '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.csv', '.json', '.js', '.py', '.html', '.css'];
-            const fileExt = '.' + file.name.split('.').pop().toLowerCase();
-            if (!allowedExtensions.includes(fileExt)) {
-                alert('Tipo de archivo no soportado');
-                fileUpload.value = '';
-                return;
-            }
-
             removeFile();
             
             try {
@@ -1752,11 +1722,11 @@
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
                 <h3>TRION AI</h3>
-                <p>Pregúntame lo que necesites. Puedo leer imágenes y archivos.</p>
+                <p>Modelo llama-3.3-70b (2026) - El mejor de Groq</p>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: Respuestas concisas</span>
+                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
                     <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
-                    <span><i class="fas fa-crown"></i> Pro: Análisis profundo</span>
+                    <span><i class="fas fa-crown"></i> Pro: Detallado</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1925,7 +1895,7 @@
                     }
                 ];
                 
-                // Añadir historial reciente (últimos 10 mensajes para no exceder tokens)
+                // Añadir historial reciente
                 const recentHistory = history.slice(-10);
                 for (let msg of recentHistory) {
                     if (msg.role === 'user' && !msg.imageData && !msg.fileData) {
@@ -1974,7 +1944,7 @@
                         'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: getActiveModel(),
+                        model: BEST_MODEL,  // Usamos el mismo modelo para todos los modos
                         messages: messages,
                         max_tokens: maxTokens,
                         temperature: temperature
@@ -2079,13 +2049,6 @@
             }
         });
     })();
-</script>
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('service-worker.js');
-        });
-    }
 </script>
 </body>
 </html>
