@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TRION · AI</title>
-    <meta name="description" content="Asistente AI personal con búsqueda automática">
+    <meta name="description" content="Asistente AI con visión y búsqueda">
     <meta name="theme-color" content="#7c3aed">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* (Mantén el mismo CSS que antes) */
         * {
             margin: 0;
             padding: 0;
@@ -1264,20 +1265,25 @@
             document.getElementById('splashScreen').classList.add('fade-out');
         }, 2000);
 
-        // ===== CONFIGURACIÓN =====
+        // ===== CONFIGURACIÓN CORREGIDA =====
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         
-        // MODELO PRINCIPAL
-        const BEST_MODEL = 'llama-3.3-70b-versatile';
-        const FALLBACK_MODEL = 'llama-3.3-70b-versatile';
-
-        // APIs de búsqueda (múltiples fuentes para mayor fiabilidad)
-        const SEARCH_APIS = {
-            wikipedia: 'https://es.wikipedia.org/api/rest_v1/page/summary/',
-            duckduckgo: 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1'
+        // MODELOS CON VISIÓN (soportan imágenes)
+        const VISION_MODELS = {
+            rapido: 'llama-3.2-11b-vision-preview',  // Rápido y con visión
+            normal: 'llama-3.2-90b-vision-preview',  // El mejor, visión avanzada
+            pro: 'llama-3.2-90b-vision-preview'      // Máxima calidad
         };
 
+        // Fallback si falla visión
+        const FALLBACK_MODEL = 'llama-3.3-70b-versatile';
+
+        // APIs de búsqueda
+        const SEARCH_API = 'https://es.wikipedia.org/api/rest_v1/page/summary/';
+        const SEARCH_WIKI = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=%s&format=json&origin=*';
+
+        // System prompts
         const PROMPTS = {
             rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa la información proporcionada. Tono profesional.",
             normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa la información proporcionada. Tono profesional.",
@@ -1319,7 +1325,7 @@
         // PWA
         let deferredPrompt = null;
 
-        // Cache de búsquedas para no repetir
+        // Cache de búsquedas
         let searchCache = new Map();
 
         // Cargar chats
@@ -1591,6 +1597,10 @@
             }
         }
 
+        function getActiveModel() {
+            return VISION_MODELS[currentMode] || VISION_MODELS.normal;
+        }
+
         function getActiveSystemPrompt() {
             return PROMPTS[currentMode];
         }
@@ -1668,6 +1678,7 @@
                 currentImageMime = file.type;
                 fileName.textContent = `📷 ${file.name} (${formatFileSize(file.size)})`;
                 fileInfo.style.display = 'flex';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> IMAGEN LISTA';
             } catch (error) {
                 alert('Error al leer la imagen');
                 imageUpload.value = '';
@@ -1691,6 +1702,7 @@
                 currentFileContent = await readFileAsText(file);
                 fileName.textContent = `📄 ${file.name} (${formatFileSize(file.size)})`;
                 fileInfo.style.display = 'flex';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> ARCHIVO LISTO';
             } catch (error) {
                 alert('Error al leer el archivo');
                 fileUpload.value = '';
@@ -1724,11 +1736,11 @@
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
                 <h3>TRION AI · ${new Date().toLocaleDateString('es-ES')}</h3>
-                <p>Pregúntame lo que quieras, buscaré información actualizada automáticamente</p>
+                <p>Modelo con visión · Leo imágenes y busco información actualizada</p>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
-                    <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
-                    <span><i class="fas fa-crown"></i> Pro: Detallado</span>
+                    <span><i class="fas fa-bolt"></i> Rápido: llama-3.2-11b</span>
+                    <span><i class="fas fa-robot"></i> Normal: llama-3.2-90b</span>
+                    <span><i class="fas fa-crown"></i> Pro: llama-3.2-90b</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1854,64 +1866,45 @@
             updateSidebar();
         };
 
-        // ===== FUNCIÓN DE BÚSQUEDA MEJORADA =====
-        async function searchInformation(query) {
-            // Verificar caché
+        // ===== BÚSQUEDA EN WIKIPEDIA (FUNCIONA SIEMPRE) =====
+        async function searchWikipedia(query) {
             const cacheKey = query.toLowerCase().trim();
             if (searchCache.has(cacheKey)) {
                 return searchCache.get(cacheKey);
             }
 
             try {
-                // 1. Intentar Wikipedia primero (más fiable)
-                const wikiTerm = encodeURIComponent(query.toLowerCase().trim());
-                const wikiResponse = await fetch(`${SEARCH_APIS.wikipedia}${wikiTerm}`);
+                // 1. Búsqueda directa
+                const term = encodeURIComponent(query.toLowerCase().trim());
+                const directResponse = await fetch(`${SEARCH_API}${term}`);
                 
-                if (wikiResponse.ok) {
-                    const wikiData = await wikiResponse.json();
-                    if (wikiData.extract) {
-                        const result = wikiData.extract.substring(0, 1000);
+                if (directResponse.ok) {
+                    const data = await directResponse.json();
+                    if (data.extract && data.extract.length > 100) {
+                        const result = data.extract.substring(0, 1500);
                         searchCache.set(cacheKey, result);
                         return result;
                     }
                 }
 
-                // 2. Si Wikipedia falla, intentar búsqueda en Wikipedia
-                const searchResponse = await fetch(
-                    `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${wikiTerm}&format=json&origin=*`
-                );
+                // 2. Búsqueda por palabras clave
+                const searchUrl = SEARCH_WIKI.replace('%s', encodeURIComponent(query));
+                const searchResponse = await fetch(searchUrl);
                 
                 if (searchResponse.ok) {
                     const searchData = await searchResponse.json();
                     if (searchData.query?.search?.length > 0) {
                         const firstTitle = searchData.query.search[0].title;
-                        const pageResponse = await fetch(`${SEARCH_APIS.wikipedia}${encodeURIComponent(firstTitle)}`);
+                        const pageResponse = await fetch(`${SEARCH_API}${encodeURIComponent(firstTitle)}`);
                         
                         if (pageResponse.ok) {
                             const pageData = await pageResponse.json();
                             if (pageData.extract) {
-                                const result = pageData.extract.substring(0, 1000);
+                                const result = pageData.extract.substring(0, 1500);
                                 searchCache.set(cacheKey, result);
                                 return result;
                             }
                         }
-                    }
-                }
-
-                // 3. Si todo falla, usar DuckDuckGo como respaldo
-                const ddgUrl = SEARCH_APIS.duckduckgo.replace('%s', encodeURIComponent(query));
-                const ddgResponse = await fetch(ddgUrl);
-                
-                if (ddgResponse.ok) {
-                    const ddgData = await ddgResponse.json();
-                    if (ddgData.AbstractText) {
-                        const result = ddgData.AbstractText.substring(0, 1000);
-                        searchCache.set(cacheKey, result);
-                        return result;
-                    } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
-                        const result = ddgData.RelatedTopics[0].Text?.substring(0, 1000) || '';
-                        searchCache.set(cacheKey, result);
-                        return result;
                     }
                 }
 
@@ -1936,6 +1929,10 @@
                 document.querySelector('.welcome-message').remove();
             }
 
+            // Guardar si hay imagen o archivo
+            const hasImage = !!currentImageBase64;
+            const hasFile = !!currentFile;
+
             // Mostrar mensaje del usuario
             if (currentImageBase64) {
                 appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime, true);
@@ -1945,33 +1942,38 @@
                 appendMessage('user', prompt, true);
             }
 
-            userInput.value = '';
-            
             const imageToSend = currentImageBase64;
             const mimeToSend = currentImageMime;
             const fileToSend = currentFile;
             const fileContentToSend = currentFileContent;
             
+            // Limpiar después de guardar
             removeFile();
 
             const thinkingMsg = showThinkingMessage();
 
             try {
-                // SIEMPRE buscar información actualizada ANTES de responder
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO...';
-                let searchResult = await searchInformation(prompt);
+                // SIEMPRE buscar información actualizada (si no hay imagen)
+                let searchResult = null;
+                if (!hasImage && !hasFile) {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO...';
+                    searchResult = await searchWikipedia(prompt);
+                } else if (hasImage) {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> ANALIZANDO IMAGEN...';
+                } else if (hasFile) {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> LEYENDO ARCHIVO...';
+                }
 
                 const history = chats[currentChatId] || [];
                 let systemPrompt = getActiveSystemPrompt();
                 
-                // Añadir la información encontrada al prompt del sistema
                 if (searchResult) {
-                    systemPrompt += `\n\nInformación actualizada relevante:\n${searchResult}`;
+                    systemPrompt += `\n\nInformación actualizada:\n${searchResult}`;
                 }
 
                 let messages = [{ role: "system", content: systemPrompt }];
                 
-                const recentHistory = history.slice(-6); // Menos historial para más info actual
+                const recentHistory = history.slice(-5);
                 for (let msg of recentHistory) {
                     if (msg.role === 'user' && !msg.imageData && !msg.fileData) {
                         messages.push({ role: "user", content: msg.text });
@@ -1986,6 +1988,7 @@
                     userContent.push({ type: "text", text: prompt });
                 }
                 
+                // Si hay imagen, usar modelo de visión
                 if (imageToSend) {
                     userContent.push({ 
                         type: "image_url", 
@@ -2010,6 +2013,9 @@
                 const temperature = currentMode === 'rapido' ? 0.3 : currentMode === 'pro' ? 0.8 : 0.6;
                 const maxTokens = currentMode === 'pro' ? 4096 : 2048;
 
+                // Usar modelo de visión si hay imagen, sino modelo normal
+                const modelToUse = hasImage ? getActiveModel() : 'llama-3.3-70b-versatile';
+
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -2017,7 +2023,7 @@
                         'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: BEST_MODEL,
+                        model: modelToUse,
                         messages: messages,
                         max_tokens: maxTokens,
                         temperature: temperature
@@ -2057,11 +2063,11 @@
                 
                 let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
                 
-                // Último recurso: responder sin búsqueda
+                // Fallback sin visión
                 try {
                     const messages = [
                         { role: "system", content: getActiveSystemPrompt() },
-                        { role: "user", content: prompt }
+                        { role: "user", content: prompt || "Hola" }
                     ];
                     
                     const fallbackResponse = await fetch(API_URL, {
