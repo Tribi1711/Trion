@@ -2002,7 +2002,7 @@
             try {
                 // DELAY DE 5 SEGUNDOS PARA MEJOR PROCESAMIENTO
                 if (currentMode === 'vision') {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO CON LLAMA-4... (5s)';
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO CON HTR... (5s)';
                 } else {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO... (5s)';
                 }
@@ -2045,7 +2045,7 @@
                         // En modo visión, instrucciones específicas
                         userContent.push({ 
                             type: "text", 
-                            text: "Analiza esta imagen en detalle con llama-4. Describe todos los elementos que ves: objetos, personas, texto, colores, composición, contexto. Sé exhaustivo en tu análisis." 
+                            text: "Analiza esta imagen en detalle con HTR. Describe todos los elementos que ves: objetos, personas, texto, colores, composición, contexto. Sé exhaustivo en tu análisis." 
                         });
                     }
                     
