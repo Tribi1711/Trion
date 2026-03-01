@@ -1265,23 +1265,13 @@
             document.getElementById('splashScreen').classList.add('fade-out');
         }, 2000);
 
-        // ===== CONFIGURACIÓN CORREGIDA =====
+        // ===== CONFIGURACIÓN =====
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         
-        // MODELOS CON VISIÓN (soportan imágenes)
-        const VISION_MODELS = {
-            rapido: 'llama-3.2-11b-vision-preview',  // Rápido y con visión
-            normal: 'llama-3.2-90b-vision-preview',  // El mejor, visión avanzada
-            pro: 'llama-3.2-90b-vision-preview'      // Máxima calidad
-        };
-
-        // Fallback si falla visión
-        const FALLBACK_MODEL = 'llama-3.3-70b-versatile';
-
-        // APIs de búsqueda
-        const SEARCH_API = 'https://es.wikipedia.org/api/rest_v1/page/summary/';
-        const SEARCH_WIKI = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=%s&format=json&origin=*';
+        // MODELOS
+        const VISION_MODEL = 'llama-3.2-11b-vision-preview';  // Modelo con visión
+        const TEXT_MODEL = 'llama-3.3-70b-versatile';         // Modelo de texto
 
         // System prompts
         const PROMPTS = {
@@ -1597,10 +1587,6 @@
             }
         }
 
-        function getActiveModel() {
-            return VISION_MODELS[currentMode] || VISION_MODELS.normal;
-        }
-
         function getActiveSystemPrompt() {
             return PROMPTS[currentMode];
         }
@@ -1646,7 +1632,10 @@
         async function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
@@ -1738,9 +1727,9 @@
                 <h3>TRION AI · ${new Date().toLocaleDateString('es-ES')}</h3>
                 <p>Modelo con visión · Leo imágenes y busco información actualizada</p>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: llama-3.2-11b</span>
-                    <span><i class="fas fa-robot"></i> Normal: llama-3.2-90b</span>
-                    <span><i class="fas fa-crown"></i> Pro: llama-3.2-90b</span>
+                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
+                    <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
+                    <span><i class="fas fa-crown"></i> Pro: Detallado</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1866,7 +1855,7 @@
             updateSidebar();
         };
 
-        // ===== BÚSQUEDA EN WIKIPEDIA (FUNCIONA SIEMPRE) =====
+        // ===== BÚSQUEDA EN WIKIPEDIA =====
         async function searchWikipedia(query) {
             const cacheKey = query.toLowerCase().trim();
             if (searchCache.has(cacheKey)) {
@@ -1876,7 +1865,7 @@
             try {
                 // 1. Búsqueda directa
                 const term = encodeURIComponent(query.toLowerCase().trim());
-                const directResponse = await fetch(`${SEARCH_API}${term}`);
+                const directResponse = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${term}`);
                 
                 if (directResponse.ok) {
                     const data = await directResponse.json();
@@ -1888,14 +1877,14 @@
                 }
 
                 // 2. Búsqueda por palabras clave
-                const searchUrl = SEARCH_WIKI.replace('%s', encodeURIComponent(query));
+                const searchUrl = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${term}&format=json&origin=*`;
                 const searchResponse = await fetch(searchUrl);
                 
                 if (searchResponse.ok) {
                     const searchData = await searchResponse.json();
                     if (searchData.query?.search?.length > 0) {
                         const firstTitle = searchData.query.search[0].title;
-                        const pageResponse = await fetch(`${SEARCH_API}${encodeURIComponent(firstTitle)}`);
+                        const pageResponse = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(firstTitle)}`);
                         
                         if (pageResponse.ok) {
                             const pageData = await pageResponse.json();
@@ -1918,7 +1907,11 @@
         async function sendMessage(isVoice = false) {
             const prompt = userInput.value.trim();
             
-            if (!prompt && !currentImageBase64 && !currentFile) {
+            // Guardar el texto antes de limpiarlo por si acaso
+            const hasImage = !!currentImageBase64;
+            const hasFile = !!currentFile;
+
+            if (!prompt && !hasImage && !hasFile) {
                 if (isVoice) {
                     userInput.value = '';
                 }
@@ -1929,31 +1922,29 @@
                 document.querySelector('.welcome-message').remove();
             }
 
-            // Guardar si hay imagen o archivo
-            const hasImage = !!currentImageBase64;
-            const hasFile = !!currentFile;
-
             // Mostrar mensaje del usuario
-            if (currentImageBase64) {
+            if (hasImage) {
                 appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime, true);
-            } else if (currentFile) {
+            } else if (hasFile) {
                 appendUserMessageWithFile(prompt, currentFile.name, formatFileSize(currentFile.size), true);
             } else {
                 appendMessage('user', prompt, true);
             }
+
+            // LIMPIAR EL INPUT INMEDIATAMENTE DESPUÉS DE ENVIAR
+            userInput.value = '';
 
             const imageToSend = currentImageBase64;
             const mimeToSend = currentImageMime;
             const fileToSend = currentFile;
             const fileContentToSend = currentFileContent;
             
-            // Limpiar después de guardar
             removeFile();
 
             const thinkingMsg = showThinkingMessage();
 
             try {
-                // SIEMPRE buscar información actualizada (si no hay imagen)
+                // Buscar información actualizada SIEMPRE (excepto si hay imagen)
                 let searchResult = null;
                 if (!hasImage && !hasFile) {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO...';
@@ -1988,7 +1979,7 @@
                     userContent.push({ type: "text", text: prompt });
                 }
                 
-                // Si hay imagen, usar modelo de visión
+                // Si hay imagen, usar formato correcto para visión
                 if (imageToSend) {
                     userContent.push({ 
                         type: "image_url", 
@@ -2013,8 +2004,8 @@
                 const temperature = currentMode === 'rapido' ? 0.3 : currentMode === 'pro' ? 0.8 : 0.6;
                 const maxTokens = currentMode === 'pro' ? 4096 : 2048;
 
-                // Usar modelo de visión si hay imagen, sino modelo normal
-                const modelToUse = hasImage ? getActiveModel() : 'llama-3.3-70b-versatile';
+                // Elegir modelo según si hay imagen
+                const modelToUse = hasImage ? VISION_MODEL : TEXT_MODEL;
 
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -2031,6 +2022,8 @@
                 });
 
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error API:', errorText);
                     throw new Error(`Error ${response.status}`);
                 }
                 
@@ -2063,33 +2056,35 @@
                 
                 let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
                 
-                // Fallback sin visión
-                try {
-                    const messages = [
-                        { role: "system", content: getActiveSystemPrompt() },
-                        { role: "user", content: prompt || "Hola" }
-                    ];
-                    
-                    const fallbackResponse = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${API_KEY}`
-                        },
-                        body: JSON.stringify({
-                            model: FALLBACK_MODEL,
-                            messages: messages,
-                            max_tokens: 2048,
-                            temperature: 0.6
-                        })
-                    });
-                    
-                    if (fallbackResponse.ok) {
-                        const fallbackData = await fallbackResponse.json();
-                        errorMessage = fallbackData.choices[0].message.content.replace(/[*]/g, '').trim();
+                // Fallback con modelo de texto
+                if (hasImage) {
+                    try {
+                        const messages = [
+                            { role: "system", content: getActiveSystemPrompt() },
+                            { role: "user", content: prompt || "Describe esta imagen" }
+                        ];
+                        
+                        const fallbackResponse = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${API_KEY}`
+                            },
+                            body: JSON.stringify({
+                                model: TEXT_MODEL,
+                                messages: messages,
+                                max_tokens: 2048,
+                                temperature: 0.6
+                            })
+                        });
+                        
+                        if (fallbackResponse.ok) {
+                            const fallbackData = await fallbackResponse.json();
+                            errorMessage = fallbackData.choices[0].message.content.replace(/[*]/g, '').trim();
+                        }
+                    } catch (fallbackError) {
+                        console.error('Error en fallback:', fallbackError);
                     }
-                } catch (fallbackError) {
-                    console.error('Error en fallback:', fallbackError);
                 }
                 
                 appendMessage('ai', errorMessage, true);
@@ -2110,7 +2105,12 @@
         }
 
         sendBtn.addEventListener('click', () => sendMessage());
-        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        userInput.addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
 
         // PWA
         window.addEventListener('beforeinstallprompt', (e) => {
