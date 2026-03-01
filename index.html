@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TRION · AI</title>
-    <meta name="description" content="Asistente AI con búsqueda en internet">
+    <meta name="description" content="Asistente AI con modos exclusivos">
     <meta name="theme-color" content="#7c3aed">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -675,18 +675,16 @@
             color: white;
         }
 
-        .mode-option.vision-mode.active {
-            background: linear-gradient(135deg, #10b981, #059669);
+        .mode-option.pro-mode-option.active {
+            background: linear-gradient(135deg, #c9a227, #dbb957);
         }
 
-        .mode-option.pro-mode-option {
-            position: relative;
+        .mode-option.razonamiento-mode.active {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
         }
 
-        .pro-lock-icon {
-            margin-left: auto;
-            font-size: 0.7rem;
-            opacity: 0.7;
+        .mode-option i {
+            width: 18px;
         }
 
         .btn-clear {
@@ -706,51 +704,6 @@
         .btn-clear:hover {
             background: rgba(124, 58, 237, 0.15);
             color: white;
-        }
-
-        /* Botón de búsqueda en internet (globo) */
-        .search-toggle-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 1px solid var(--border-subtle);
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            transition: all 0.2s;
-        }
-
-        .search-toggle-btn:hover {
-            border-color: var(--accent-primary);
-            color: white;
-            background: rgba(124, 58, 237, 0.1);
-        }
-
-        .search-toggle-btn.active {
-            background: var(--accent-primary);
-            color: white;
-            border-color: var(--accent-primary);
-        }
-
-        body.pro-mode .search-toggle-btn {
-            border-color: var(--pro-border);
-            color: var(--pro-text-secondary);
-        }
-
-        body.pro-mode .search-toggle-btn:hover {
-            border-color: var(--pro-accent);
-            color: var(--pro-accent);
-            background: rgba(201, 162, 39, 0.1);
-        }
-
-        body.pro-mode .search-toggle-btn.active {
-            background: var(--pro-accent);
-            color: #1e1b2b;
-            border-color: var(--pro-accent);
         }
 
         .chat-box {
@@ -830,6 +783,10 @@
             font-weight: 600;
             color: var(--accent-secondary);
             text-transform: uppercase;
+        }
+
+        body.pro-mode .ai .message-header span {
+            color: var(--pro-accent);
         }
 
         .message-image-preview {
@@ -1042,8 +999,8 @@
             margin-top: 10px;
         }
 
-        /* Modal para contraseña Pro */
-        .pro-password-modal {
+        /* Modal para contraseñas */
+        .password-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -1060,7 +1017,7 @@
             transition: all 0.3s ease;
         }
 
-        .pro-password-modal.show {
+        .password-modal.show {
             opacity: 1;
             visibility: visible;
         }
@@ -1216,6 +1173,21 @@
             justify-content: center;
         }
 
+        /* Contador rápido */
+        .rapido-counter {
+            font-size: 0.7rem;
+            margin-left: 5px;
+            padding: 2px 6px;
+            border-radius: 20px;
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        body.pro-mode .rapido-counter {
+            background: rgba(201, 162, 39, 0.2);
+            color: var(--pro-accent);
+        }
+
         @media (max-width: 768px) {
             :root {
                 --header-height: 60px;
@@ -1283,12 +1255,6 @@
                 padding: 6px 12px;
                 font-size: 0.75rem;
                 gap: 4px;
-            }
-
-            .search-toggle-btn {
-                width: 42px;
-                height: 42px;
-                font-size: 1.1rem;
             }
 
             .chat-box {
@@ -1414,12 +1380,26 @@
     </div>
 </div>
 
-<!-- Modal contraseña Pro -->
-<div class="pro-password-modal" id="proPasswordModal">
+<!-- Modal contraseña para modo Razonamiento -->
+<div class="password-modal" id="razonamientoPasswordModal">
+    <div class="modal-content">
+        <i class="fas fa-brain"></i>
+        <h3>TRION Razonamiento</h3>
+        <p>Introduce la contraseña para desbloquear el modo Razonamiento (búsqueda automática en Google)</p>
+        <input type="password" id="razonamientoPassword" placeholder="Contraseña" value="">
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="cancelRazonamientoAccess()">Cancelar</button>
+            <button class="btn-confirm" onclick="verifyRazonamientoPassword()">Acceder</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal contraseña para modo Pro/Advanced -->
+<div class="password-modal" id="proPasswordModal">
     <div class="modal-content">
         <i class="fas fa-crown"></i>
-        <h3>TRION PRO</h3>
-        <p>Introduce la contraseña para desbloquear el modo premium</p>
+        <h3>TRION Advanced</h3>
+        <p>Introduce la contraseña para desbloquear el modo Advanced (tema dorado + búsqueda inteligente + imágenes)</p>
         <input type="password" id="proPassword" placeholder="Contraseña" value="">
         <div class="modal-buttons">
             <button class="btn-cancel" onclick="cancelProAccess()">Cancelar</button>
@@ -1466,33 +1446,24 @@
                 <div class="logo">
                     <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
                 </div>
-                <h1>TRION</h1>
-                <span id="status"><i class="fas fa-circle"></i> NORMAL</span>
+                <h1 id="brandTitle">TRION</h1>
+                <span id="status"><i class="fas fa-circle"></i> RÁPIDO</span>
             </div>
             <div class="header-controls">
-                <!-- Botón de búsqueda en internet (globo) -->
-                <button class="search-toggle-btn" id="searchToggleBtn" onclick="toggleSearch()">
-                    <i class="fas fa-globe"></i>
-                </button>
-
                 <div class="mode-dropdown">
                     <button class="mode-dropdown-btn">
-                        <span id="selectedMode">Normal</span>
+                        <span id="selectedMode">Rápido</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="mode-dropdown-content">
-                        <div class="mode-option" data-mode="rapido" id="rapidoMode">
-                            <i class="fas fa-bolt"></i> Rápido
+                        <div class="mode-option active" data-mode="rapido" id="rapidoMode">
+                            <i class="fas fa-bolt"></i> Rápido <span class="rapido-counter" id="rapidoCounter">10/10</span>
                         </div>
-                        <div class="mode-option active" data-mode="normal" id="normalMode">
-                            <i class="fas fa-robot"></i> Normal
+                        <div class="mode-option razonamiento-mode" data-mode="razonamiento" id="razonamientoMode">
+                            <i class="fas fa-brain"></i> Razonamiento
                         </div>
                         <div class="mode-option pro-mode-option" data-mode="pro" id="proMode">
-                            <i class="fas fa-crown"></i> Pro
-                            <span class="pro-lock-icon"><i class="fas fa-lock"></i></span>
-                        </div>
-                        <div class="mode-option vision-mode" data-mode="vision" id="visionMode">
-                            <i class="fas fa-eye"></i> TRION VISION
+                            <i class="fas fa-crown"></i> Advanced
                         </div>
                     </div>
                 </div>
@@ -1503,8 +1474,9 @@
         <div id="chat-box" class="chat-box"></div>
 
         <div class="input-area">
+            <!-- Botón de imagen solo visible en modo Pro/Advanced -->
             <div class="file-buttons" id="fileButtons" style="display: none;">
-                <label class="attach-btn" id="vision-attach-btn" style="border-color: #10b981;">
+                <label class="attach-btn" id="vision-attach-btn" style="border-color: #c9a227;">
                     <i class="fas fa-camera"></i>
                     <input type="file" id="imageUpload" accept="image/*">
                 </label>
@@ -1556,13 +1528,13 @@
         const WIKIPEDIA_API = 'https://es.wikipedia.org/api/rest_v1/page/summary/';
         const DUCKDUCKGO_API = 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1';
         const SEARCH_WIKI = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=%s&format=json&origin=*';
+        const GOOGLE_API = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyDummyKey&cx=0123456789'; // Placeholder - se usará DuckDuckGo como respaldo
 
         // System prompts
         const PROMPTS = {
-            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Tono profesional y directo.",
-            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil, en unos 3-5 párrafos. Tono profesional.",
-            pro: "Eres Trion PRO, un asistente AI premium creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA Y PROFUNDA, desarrollando conceptos a fondo. Explica con ejemplos si es posible. Tono experto y elegante.",
-            vision: "Eres TRION VISION, un asistente AI versátil creado por Hugo Tribaldos que puede analizar imágenes y ayudar con cualquier tarea relacionada. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Cuando recibas una imagen, puedes: 1) Describirla detalladamente 2) Ayudar a crear cartas, documentos o cualquier contenido basado en lo que ves 3) Responder preguntas específicas sobre la imagen 4) Dar consejos o sugerencias 5) Realizar cualquier tarea que el usuario te pida basándote en la imagen. Eres flexible y te adaptas a lo que necesite el usuario. Responde SIEMPRE en español y de forma útil."
+            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Tono profesional y directo. NO busques información en internet a menos que sea estrictamente necesario.",
+            razonamiento: "Eres Trion en modo Razonamiento, un asistente AI experto creado por Hugo Tribaldos con acceso TOTAL a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Debes buscar SIEMPRE información actualizada en Google/Internet para responder. Responde de forma clara y detallada, citando fuentes. Tono profesional.",
+            pro: "Eres TRION ADVANCED, un asistente AI premium creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Tienes acceso a internet y capacidad de análisis de imágenes. Responde de forma DETALLADA Y PROFUNDA, desarrollando conceptos a fondo. Busca información en internet SOLO cuando sea necesario (preguntas factuales, eventos actuales, etc.). Si es un saludo o conversación casual, no es necesario buscar. Tono experto y elegante."
         };
 
         const chatBox = document.getElementById('chat-box');
@@ -1570,26 +1542,33 @@
         const sendBtn = document.getElementById('send-btn');
         const statusDiv = document.getElementById('status');
         const selectedModeSpan = document.getElementById('selectedMode');
+        const brandTitle = document.getElementById('brandTitle');
         const rapidMode = document.getElementById('rapidoMode');
-        const normalMode = document.getElementById('normalMode');
+        const razonamientoMode = document.getElementById('razonamientoMode');
         const proMode = document.getElementById('proMode');
-        const visionMode = document.getElementById('visionMode');
         const imageUpload = document.getElementById('imageUpload');
         const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
         const fileButtons = document.getElementById('fileButtons');
-        const searchToggleBtn = document.getElementById('searchToggleBtn');
+        const razonamientoPasswordModal = document.getElementById('razonamientoPasswordModal');
         const proPasswordModal = document.getElementById('proPasswordModal');
+        const rapidoCounter = document.getElementById('rapidoCounter');
 
-        let currentMode = 'normal';
+        let currentMode = 'rapido'; // Solo rápido disponible inicialmente
         let currentImageBase64 = null;
         let currentImageMime = null;
-        let internetSearchEnabled = false; // Botón de búsqueda desactivado por defecto
-        let proUnlocked = false; // Estado del modo Pro
+        let proUnlocked = false;
+        let razonamientoUnlocked = false;
 
         // Chats
         let chats = {};
         let currentChatId = 'default';
+
+        // Límite de 10 usos diarios para modo rápido
+        let rapidUsage = {
+            date: new Date().toDateString(),
+            count: 0
+        };
 
         // PWA
         let deferredPrompt = null;
@@ -1597,17 +1576,79 @@
         // Cache de búsquedas
         let searchCache = new Map();
 
-        // Cargar chats
-        function loadChats() {
+        // Cargar datos de localStorage
+        function loadLocalData() {
             try {
-                const saved = localStorage.getItem('trion_chats');
-                chats = saved ? JSON.parse(saved) : { default: [] };
+                // Cargar chats
+                const savedChats = localStorage.getItem('trion_chats');
+                chats = savedChats ? JSON.parse(savedChats) : { default: [] };
                 if (!chats[currentChatId]) currentChatId = 'default';
+
+                // Cargar límite de rápido
+                const savedUsage = localStorage.getItem('trion_rapid_usage');
+                if (savedUsage) {
+                    rapidUsage = JSON.parse(savedUsage);
+                    // Si es otro día, reiniciar contador
+                    if (rapidUsage.date !== new Date().toDateString()) {
+                        rapidUsage = {
+                            date: new Date().toDateString(),
+                            count: 0
+                        };
+                    }
+                } else {
+                    rapidUsage = {
+                        date: new Date().toDateString(),
+                        count: 0
+                    };
+                }
+
+                // Cargar estados desbloqueados
+                const savedRazonamiento = localStorage.getItem('trion_razonamiento_unlocked');
+                razonamientoUnlocked = savedRazonamiento === 'true';
+                
+                const savedPro = localStorage.getItem('trion_pro_unlocked');
+                proUnlocked = savedPro === 'true';
+
+                // Si algún modo estaba desbloqueado, aplicar tema si es pro
+                if (proUnlocked) {
+                    document.body.classList.add('pro-mode');
+                }
+
                 loadHistory();
                 updateSidebar();
+                updateRapidoCounter();
             } catch (e) {
                 chats = { default: [] };
+                rapidUsage = {
+                    date: new Date().toDateString(),
+                    count: 0
+                };
             }
+        }
+
+        function saveLocalData() {
+            localStorage.setItem('trion_chats', JSON.stringify(chats));
+            localStorage.setItem('trion_rapid_usage', JSON.stringify(rapidUsage));
+            localStorage.setItem('trion_razonamiento_unlocked', razonamientoUnlocked.toString());
+            localStorage.setItem('trion_pro_unlocked', proUnlocked.toString());
+            updateSidebar();
+            updateRapidoCounter();
+        }
+
+        function updateRapidoCounter() {
+            if (rapidoCounter) {
+                const remaining = Math.max(0, 10 - rapidUsage.count);
+                rapidoCounter.textContent = `${remaining}/10`;
+            }
+        }
+
+        function canUseRapido() {
+            return rapidUsage.count < 10;
+        }
+
+        function incrementRapidoUsage() {
+            rapidUsage.count++;
+            saveLocalData();
         }
 
         function saveChats() {
@@ -1701,25 +1742,27 @@
             document.getElementById('chatSidebar').classList.toggle('open');
         };
 
-        // Función para activar/desactivar búsqueda en internet
-        window.toggleSearch = function() {
-            internetSearchEnabled = !internetSearchEnabled;
-            if (internetSearchEnabled) {
-                searchToggleBtn.classList.add('active');
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> BÚSQUEDA ACTIVADA';
-                setTimeout(() => updateModeUI(), 1500);
-            } else {
-                searchToggleBtn.classList.remove('active');
+        // Funciones para modos
+        window.cancelRazonamientoAccess = function() {
+            razonamientoPasswordModal.classList.remove('show');
+        };
+
+        window.verifyRazonamientoPassword = function() {
+            const password = document.getElementById('razonamientoPassword').value;
+            if (password === 'htrion') {
+                razonamientoUnlocked = true;
+                razonamientoPasswordModal.classList.remove('show');
+                currentMode = 'razonamiento';
                 updateModeUI();
+                saveLocalData();
+            } else {
+                alert('Contraseña incorrecta');
+                document.getElementById('razonamientoPassword').value = '';
             }
         };
 
-        // Funciones para el modal Pro
         window.cancelProAccess = function() {
             proPasswordModal.classList.remove('show');
-            // Volver al modo anterior (normal)
-            currentMode = 'normal';
-            updateModeUI();
         };
 
         window.verifyProPassword = function() {
@@ -1730,6 +1773,8 @@
                 currentMode = 'pro';
                 updateModeUI();
                 document.body.classList.add('pro-mode');
+                brandTitle.textContent = 'TRION ADVANCED';
+                saveLocalData();
             } else {
                 alert('Contraseña incorrecta');
                 document.getElementById('proPassword').value = '';
@@ -1741,71 +1786,54 @@
             // Quitar active de todas las opciones
             document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
             
-            // Activar la correspondiente
-            let modeText = '';
-            let statusText = '';
-            let showVisionFileBtn = false;
-
+            // Determinar modo actual
             if (currentMode === 'rapido') {
                 rapidMode.classList.add('active');
-                modeText = 'Rápido';
-                statusText = 'RÁPIDO';
-                showVisionFileBtn = false;
+                selectedModeSpan.textContent = 'Rápido';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
+                fileButtons.style.display = 'none';
+                removeFile();
+                // Quitar tema pro si estaba
+                if (!proUnlocked) document.body.classList.remove('pro-mode');
+                brandTitle.textContent = 'TRION';
+            } else if (currentMode === 'razonamiento') {
+                razonamientoMode.classList.add('active');
+                selectedModeSpan.textContent = 'Razonamiento';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> RAZONAMIENTO';
+                fileButtons.style.display = 'none';
+                removeFile();
+                // Quitar tema pro si estaba
+                if (!proUnlocked) document.body.classList.remove('pro-mode');
+                brandTitle.textContent = 'TRION';
             } else if (currentMode === 'pro') {
                 proMode.classList.add('active');
-                modeText = 'Pro';
-                statusText = 'PRO';
-                showVisionFileBtn = false;
-                // Asegurar tema pro
+                selectedModeSpan.textContent = 'Advanced';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> ADVANCED';
+                fileButtons.style.display = 'flex'; // Mostrar botón de imagen
                 document.body.classList.add('pro-mode');
-            } else if (currentMode === 'vision') {
-                visionMode.classList.add('active');
-                modeText = 'TRION VISION';
-                statusText = 'VISIÓN';
-                showVisionFileBtn = true;
-                // Quitar tema pro si no es pro
-                if (!proUnlocked) document.body.classList.remove('pro-mode');
-            } else {
-                normalMode.classList.add('active');
-                modeText = 'Normal';
-                statusText = 'NORMAL';
-                showVisionFileBtn = false;
-                // Quitar tema pro
-                document.body.classList.remove('pro-mode');
+                brandTitle.textContent = 'TRION ADVANCED';
             }
 
-            selectedModeSpan.textContent = modeText;
-            
-            // Si búsqueda activa, mostrar eso en status, sino el modo
-            if (internetSearchEnabled) {
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> BÚSQUEDA ACTIVADA';
-            } else {
-                statusDiv.innerHTML = `<i class="fas fa-circle"></i> ${statusText}`;
-            }
-            
-            // Mostrar/ocultar botón de adjuntar imagen según modo visión
-            fileButtons.style.display = showVisionFileBtn ? 'flex' : 'none';
-            
-            // Si no estamos en modo visión, eliminar cualquier imagen seleccionada
-            if (!showVisionFileBtn) {
-                removeFile();
-            }
+            // Actualizar contador rápido
+            updateRapidoCounter();
         }
 
-        // Listeners para modos (con control de acceso para Pro)
+        // Listeners para modos
         rapidMode.addEventListener('click', (e) => {
             e.stopPropagation();
             currentMode = 'rapido';
-            // Si estábamos en pro, quitamos tema
-            document.body.classList.remove('pro-mode');
             updateModeUI();
         });
         
-        normalMode.addEventListener('click', (e) => {
+        razonamientoMode.addEventListener('click', (e) => {
             e.stopPropagation();
-            currentMode = 'normal';
-            document.body.classList.remove('pro-mode');
-            updateModeUI();
+            if (razonamientoUnlocked) {
+                currentMode = 'razonamiento';
+                updateModeUI();
+            } else {
+                razonamientoPasswordModal.classList.add('show');
+                document.getElementById('razonamientoPassword').value = '';
+            }
         });
         
         proMode.addEventListener('click', (e) => {
@@ -1814,17 +1842,9 @@
                 currentMode = 'pro';
                 updateModeUI();
             } else {
-                // Mostrar modal de contraseña
                 proPasswordModal.classList.add('show');
                 document.getElementById('proPassword').value = '';
             }
-        });
-        
-        visionMode.addEventListener('click', (e) => {
-            e.stopPropagation();
-            currentMode = 'vision';
-            document.body.classList.remove('pro-mode');
-            updateModeUI();
         });
 
         function formatFileSize(bytes) {
@@ -1863,6 +1883,13 @@
                 return;
             }
 
+            // Solo permitir en modo pro
+            if (currentMode !== 'pro') {
+                alert('La carga de imágenes solo está disponible en modo Advanced');
+                imageUpload.value = '';
+                return;
+            }
+
             removeFile();
             
             try {
@@ -1870,7 +1897,7 @@
                 currentImageMime = file.type;
                 fileName.textContent = `📷 ${file.name} (${formatFileSize(file.size)})`;
                 fileInfo.style.display = 'flex';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: IMAGEN LISTA';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> ADVANCED: IMAGEN LISTA';
             } catch (error) {
                 alert('Error al leer la imagen');
                 imageUpload.value = '';
@@ -1902,14 +1929,12 @@
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
                 <h3>TRION AI</h3>
-                <p>TRION VISION · HTR</p>
-                <div class="version-badge">v2.5 (búsqueda manual + Pro dorado)</div>
+                <p>TRION · HTR</p>
+                <div class="version-badge">v3.0 (modos exclusivos)</div>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
-                    <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
-                    <span><i class="fas fa-crown"></i> Pro: Detallado (requiere contraseña)</span>
-                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Imágenes</span>
-                    <span><i class="fas fa-globe"></i> Botón mundo: activa búsqueda en internet</span>
+                    <span><i class="fas fa-bolt"></i> Rápido: 10 usos diarios</span>
+                    <span><i class="fas fa-brain"></i> Razonamiento: búsqueda automática (pass: htrion)</span>
+                    <span><i class="fas fa-crown"></i> Advanced: tema dorado + imágenes (pass: trion1711)</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1941,11 +1966,14 @@
                 };
                 
                 const span = document.createElement('span');
-                span.textContent = currentMode === 'vision' ? 'TRION VISION' : (currentMode === 'pro' ? 'TRION PRO' : 'TRION');
-                if (currentMode === 'vision') {
-                    span.style.color = '#10b981';
-                } else if (currentMode === 'pro') {
+                if (currentMode === 'pro') {
+                    span.textContent = 'TRION ADVANCED';
                     span.style.color = '#c9a227';
+                } else if (currentMode === 'razonamiento') {
+                    span.textContent = 'TRION RAZONAMIENTO';
+                    span.style.color = '#3b82f6';
+                } else {
+                    span.textContent = 'TRION RÁPIDO';
                 }
                 
                 header.appendChild(logoImg);
@@ -2007,9 +2035,22 @@
             updateSidebar();
         };
 
-        // ===== BÚSQUEDA EN INTERNET (solo si está activada) =====
-        async function searchInternet(query) {
-            if (!internetSearchEnabled) return null; // No buscar si no está activado
+        // ===== BÚSQUEDA EN INTERNET (adaptada a cada modo) =====
+        async function searchInternet(query, force = false) {
+            // En modo rápido, no buscar nunca
+            if (currentMode === 'rapido' && !force) return null;
+            
+            // En modo razonamiento, buscar siempre
+            // En modo pro, buscar solo si es necesario (detectamos si es pregunta factual)
+            
+            // Simple heurística: si la query tiene menos de 4 palabras o es saludo, no buscar
+            if (currentMode === 'pro') {
+                const words = query.trim().split(/\s+/).length;
+                const isGreeting = /^(hola|buenos días|buenas tardes|buenas noches|hey|que tal|como estas|saludos)/i.test(query.trim());
+                if (words < 4 || isGreeting) {
+                    return null; // No buscar en internet
+                }
+            }
             
             const cacheKey = query.toLowerCase().trim();
             if (searchCache.has(cacheKey)) {
@@ -2017,7 +2058,7 @@
             }
 
             try {
-                // 1. Intentar Wikipedia
+                // Intentar Wikipedia primero
                 const term = encodeURIComponent(query.toLowerCase().trim());
                 const wikiResponse = await fetch(`${WIKIPEDIA_API}${term}`);
                 
@@ -2035,7 +2076,7 @@
                     }
                 }
 
-                // 2. Buscar en Wikipedia si no hay resultado directo
+                // Buscar en Wikipedia
                 const searchUrl = SEARCH_WIKI.replace('%s', encodeURIComponent(query));
                 const searchResponse = await fetch(searchUrl);
                 
@@ -2061,7 +2102,7 @@
                     }
                 }
 
-                // 3. Intentar DuckDuckGo como respaldo
+                // DuckDuckGo como respaldo
                 const ddgUrl = DUCKDUCKGO_API.replace('%s', encodeURIComponent(query));
                 const ddgResponse = await fetch(ddgUrl);
                 
@@ -2096,25 +2137,27 @@
             }
         }
 
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
         async function sendMessage() {
             const prompt = userInput.value.trim();
             
             const hasImage = !!currentImageBase64;
 
-            // Validaciones específicas para modo visión
-            if (currentMode === 'vision') {
-                if (!hasImage) {
-                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda ayudarte. Estoy en modo TRION VISION y necesito una imagen para trabajar.', true);
-                    userInput.value = '';
-                    return;
-                }
+            // Validaciones específicas
+            if (currentMode === 'pro' && hasImage) {
+                // OK, modo pro acepta imágenes
+            } else if (hasImage && currentMode !== 'pro') {
+                alert('La carga de imágenes solo está disponible en modo Advanced');
+                removeFile();
+                return;
             }
 
             if (!prompt && !hasImage) {
+                return;
+            }
+
+            // Verificar límite de rápido
+            if (currentMode === 'rapido' && !canUseRapido()) {
+                appendMessage('ai', '⚠️ Has alcanzado el límite de 10 usos diarios del modo Rápido. Vuelve mañana o cambia a otro modo.', true);
                 return;
             }
 
@@ -2129,7 +2172,12 @@
                 appendMessage('user', prompt, true);
             }
 
-            // LIMPIAR EL INPUT INMEDIATAMENTE
+            // Incrementar contador si es modo rápido
+            if (currentMode === 'rapido') {
+                incrementRapidoUsage();
+            }
+
+            // LIMPIAR EL INPUT
             userInput.value = '';
 
             const imageToSend = currentImageBase64;
@@ -2140,23 +2188,22 @@
             const thinkingMsg = showThinkingMessage();
 
             try {
-                // Mostrar estado según búsqueda
-                if (internetSearchEnabled) {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET...';
+                // Buscar en internet según el modo
+                let searchResult = null;
+                if (currentMode === 'razonamiento') {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN GOOGLE...';
+                    searchResult = await searchInternet(prompt, true);
+                } else if (currentMode === 'pro') {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> ANALIZANDO...';
+                    searchResult = await searchInternet(prompt, false);
                 } else {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO...';
-                }
-
-                // Buscar información en internet SOLO si está activado
-                let searchResult = null;
-                if (internetSearchEnabled && !hasImage) {
-                    searchResult = await searchInternet(prompt);
                 }
 
                 const history = chats[currentChatId] || [];
                 let systemPrompt = PROMPTS[currentMode];
                 
-                // Añadir resultados de búsqueda al prompt del sistema si existen
+                // Añadir resultados de búsqueda si existen
                 if (searchResult) {
                     systemPrompt += `\n\nINFORMACIÓN ACTUALIZADA DE INTERNET (${new Date().toLocaleString('es-ES')}):\n`;
                     systemPrompt += `Fuente: ${searchResult.source}\n`;
@@ -2238,8 +2285,8 @@
                 
                 let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
                 
-                if (currentMode === 'vision') {
-                    errorMessage = '👁️ Error al procesar la imagen. Por favor, intenta de nuevo con otra imagen.';
+                if (currentMode === 'pro' && imageToSend) {
+                    errorMessage = 'Error al procesar la imagen. Por favor, intenta de nuevo.';
                 }
                 
                 appendMessage('ai', errorMessage, true);
@@ -2278,7 +2325,7 @@
         };
 
         // Inicializar
-        loadChats();
+        loadLocalData();
         updateModeUI();
 
         // Cerrar sidebar al hacer click fuera en móvil
@@ -2294,10 +2341,15 @@
             }
         });
 
-        // Cerrar modal con Escape
+        // Cerrar modales con Escape
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && proPasswordModal.classList.contains('show')) {
-                cancelProAccess();
+            if (e.key === 'Escape') {
+                if (razonamientoPasswordModal.classList.contains('show')) {
+                    cancelRazonamientoAccess();
+                }
+                if (proPasswordModal.classList.contains('show')) {
+                    cancelProAccess();
+                }
             }
         });
     })();
