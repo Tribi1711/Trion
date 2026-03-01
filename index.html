@@ -1643,7 +1643,7 @@
         const advancedPasswordModal = document.getElementById('advancedPasswordModal');
         const rapidoCounter = document.getElementById('rapidoCounter');
 
-        let currentMode = 'rapido'; // Solo rápido disponible inicialmente
+        let currentMode = 'rapido'; // Será sobrescrito por localStorage si existe
         let currentImageBase64 = null;
         let currentImageMime = null;
         
@@ -1724,9 +1724,30 @@
                     localStorage.removeItem('trion_advanced_password');
                 }
 
-                // Si algún modo estaba desbloqueado, aplicar tema si es advanced
-                if (advancedUnlocked) {
+                // Cargar último modo usado
+                const savedMode = localStorage.getItem('trion_last_mode');
+                if (savedMode) {
+                    // Verificar que el modo sea válido y esté desbloqueado si es necesario
+                    if (savedMode === 'razonamiento' && razonamientoUnlocked) {
+                        currentMode = 'razonamiento';
+                    } else if (savedMode === 'advanced' && advancedUnlocked) {
+                        currentMode = 'advanced';
+                    } else if (savedMode === 'rapido') {
+                        currentMode = 'rapido';
+                    } else {
+                        currentMode = 'rapido'; // Por defecto
+                    }
+                } else {
+                    currentMode = 'rapido'; // Por defecto
+                }
+
+                // Si el modo actual es advanced, aplicar tema
+                if (currentMode === 'advanced' && advancedUnlocked) {
                     document.body.classList.add('advanced-mode');
+                    brandTitle.textContent = 'TRION ADVANCED';
+                } else {
+                    document.body.classList.remove('advanced-mode');
+                    brandTitle.textContent = 'TRION';
                 }
 
                 loadHistory();
@@ -1739,12 +1760,16 @@
                     date: new Date().toDateString(),
                     count: 0
                 };
+                currentMode = 'rapido';
             }
         }
 
         function saveLocalData() {
             localStorage.setItem('trion_chats', JSON.stringify(chats));
             localStorage.setItem('trion_rapid_usage', JSON.stringify(rapidUsage));
+            
+            // Guardar último modo usado
+            localStorage.setItem('trion_last_mode', currentMode);
             
             // Guardar estados con las contraseñas para verificación futura
             if (razonamientoUnlocked) {
@@ -1983,6 +2008,9 @@
             // Actualizar contador rápido
             updateRapidoCounter();
             updateAdvancedUI();
+            
+            // Guardar el modo actual en localStorage
+            saveLocalData();
         }
 
         function updateAdvancedUI() {
@@ -2106,7 +2134,7 @@
             welcomeDiv.innerHTML = `
                 <h3>TRION AI</h3>
                 <p>TRION · HTR</p>
-                <div class="version-badge">v4.0 (advanced exclusivo)</div>
+                <div class="version-badge">v4.5 (modo persistente)</div>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
                     <span><i class="fas fa-bolt"></i> Rápido: 3 usos diarios</span>
                     <span><i class="fas fa-brain"></i> Razonamiento: búsqueda automática</span>
