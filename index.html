@@ -478,7 +478,7 @@
             border: 1px solid var(--border-subtle);
             border-radius: 18px;
             padding: 8px;
-            min-width: 200px;
+            min-width: 180px;
             box-shadow: var(--shadow-xl);
             opacity: 0;
             visibility: hidden;
@@ -852,6 +852,18 @@
             line-height: 1.6;
         }
 
+        .version-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            margin-top: 10px;
+        }
+
         .voice-indicator {
             position: fixed;
             bottom: 100px;
@@ -1216,7 +1228,7 @@
                             <i class="fas fa-crown"></i> Pro
                         </div>
                         <div class="mode-option vision-mode" data-mode="vision" id="visionMode">
-                            <i class="fas fa-eye"></i> TRION VISIÓN
+                            <i class="fas fa-eye"></i> TRION VISION
                         </div>
                     </div>
                 </div>
@@ -1276,17 +1288,15 @@
             document.getElementById('splashScreen').classList.add('fade-out');
         }, 2000);
 
-        // ===== CONFIGURACIÓN CON EL MODELO QUE PIDES =====
+        // ===== CONFIGURACIÓN =====
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         
-        // MODELO DE VISIÓN (el que me pediste)
+        // MODELOS
         const VISION_MODEL = 'meta-llama/llama-4-maverick-17b-128e-instruct';
-        
-        // MODELO DE TEXTO
         const TEXT_MODEL = 'llama-3.3-70b-versatile';
 
-        // System prompts
+        // System prompts - SIN MENCIONAR LLAMA
         const PROMPTS = {
             rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa la información proporcionada. Tono profesional.",
             normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa la información proporcionada. Tono profesional.",
@@ -1332,6 +1342,10 @@
 
         // Cache de búsquedas
         let searchCache = new Map();
+
+        // Fecha actual para la versión
+        const today = new Date();
+        const versionDate = today.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.');
 
         // Cargar chats
         function loadChats() {
@@ -1608,7 +1622,7 @@
 
         function getActiveModel() {
             if (currentMode === 'vision') {
-                return VISION_MODEL; // meta-llama/llama-4-maverick-17b-128e-instruct
+                return VISION_MODEL;
             }
             return TEXT_MODEL;
         }
@@ -1630,8 +1644,8 @@
                 document.getElementById('vision-attach-btn').style.boxShadow = 'none';
             } else if (currentMode === 'vision') {
                 visionMode.classList.add('active');
-                selectedModeSpan.textContent = 'VISIÓN';
-                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> TRION VISIÓN';
+                selectedModeSpan.textContent = 'TRION VISION';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN';
                 document.getElementById('vision-attach-btn').style.borderColor = '#10b981';
                 document.getElementById('vision-attach-btn').style.boxShadow = '0 0 15px #10b981';
             } else {
@@ -1765,13 +1779,14 @@
             const welcomeDiv = document.createElement('div');
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
-                <h3>TRION AI · ${new Date().toLocaleDateString('es-ES')}</h3>
-                <p>Selecciona <span style="color:#10b981; font-weight:bold;">TRION VISIÓN</span> para analizar imágenes</p>
+                <h3>TRION AI</h3>
+                <p>Selecciona <span style="color:#10b981; font-weight:bold;">TRION VISION</span> para analizar imágenes</p>
+                <div class="version-badge">v1.6 · ${versionDate}</div>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
                     <span><i class="fas fa-bolt"></i> Rápido: Texto conciso</span>
                     <span><i class="fas fa-robot"></i> Normal: Texto equilibrado</span>
                     <span><i class="fas fa-crown"></i> Pro: Texto detallado</span>
-                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISIÓN:</span>
+                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Análisis de imágenes</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1803,7 +1818,7 @@
                 };
                 
                 const span = document.createElement('span');
-                span.textContent = currentMode === 'vision' ? 'TRION VISIÓN' : 'TRION';
+                span.textContent = currentMode === 'vision' ? 'TRION VISION' : 'TRION';
                 if (currentMode === 'vision') {
                     span.style.color = '#10b981';
                 }
@@ -1900,7 +1915,7 @@
             updateSidebar();
         };
 
-        // ===== BÚSQUEDA EN WIKIPEDIA (solo para modos de texto) =====
+        // ===== BÚSQUEDA EN WIKIPEDIA =====
         async function searchWikipedia(query) {
             const cacheKey = query.toLowerCase().trim();
             if (searchCache.has(cacheKey)) {
@@ -1961,7 +1976,7 @@
             // Validaciones específicas para modo visión
             if (currentMode === 'vision') {
                 if (!hasImage) {
-                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda analizarla con HTR. Estoy en modo VISIÓN y necesito una imagen para ayudarte.', true);
+                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda analizarla. Estoy en modo TRION VISION y necesito una imagen para ayudarte.', true);
                     userInput.value = '';
                     return;
                 }
@@ -2000,13 +2015,13 @@
             const thinkingMsg = showThinkingMessage();
 
             try {
-                // DELAY DE 5 SEGUNDOS PARA MEJOR PROCESAMIENTO
+                // DELAY DE 5 SEGUNDOS
                 if (currentMode === 'vision') {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO CON HTR... (5s)';
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO... (5s)';
                 } else {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO... (5s)';
                 }
-                await delay(5000); // 5 segundos de espera
+                await delay(5000);
 
                 // Buscar información solo si NO estamos en modo visión
                 let searchResult = null;
@@ -2039,13 +2054,11 @@
                     userContent.push({ type: "text", text: prompt });
                 }
                 
-                // Si hay imagen, enviarla
                 if (imageToSend) {
                     if (currentMode === 'vision') {
-                        // En modo visión, instrucciones específicas
                         userContent.push({ 
                             type: "text", 
-                            text: "Analiza esta imagen en detalle con HTR. Describe todos los elementos que ves: objetos, personas, texto, colores, composición, contexto. Sé exhaustivo en tu análisis." 
+                            text: "Analiza esta imagen en detalle con TRION VISION. Describe todos los elementos que ves: objetos, personas, texto, colores, composición, contexto. Sé exhaustivo en tu análisis." 
                         });
                     }
                     
@@ -2072,12 +2085,7 @@
                 const temperature = currentMode === 'rapido' ? 0.3 : currentMode === 'pro' ? 0.8 : 0.6;
                 const maxTokens = currentMode === 'pro' ? 4096 : 2048;
 
-                // Usar el modelo según el modo
                 const modelToUse = getActiveModel();
-
-                console.log('Usando modelo:', modelToUse);
-                console.log('Modo actual:', currentMode);
-                console.log('Tiene imagen:', hasImage);
 
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -2129,7 +2137,7 @@
                 let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
                 
                 if (currentMode === 'vision') {
-                    errorMessage = '👁️ Error al analizar la imagen con TRION VISION. Por favor, intenta de nuevo con otra imagen.';
+                    errorMessage = '👁️ Error al analizar la imagen. Por favor, intenta de nuevo con otra imagen.';
                 }
                 
                 appendMessage('ai', errorMessage, true);
