@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TRION · AI</title>
-    <meta name="description" content="Asistente AI con visión y búsqueda">
+    <meta name="description" content="Asistente AI con búsqueda en internet">
     <meta name="theme-color" content="#7c3aed">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -647,22 +647,6 @@
             border: 2px solid rgba(124, 58, 237, 0.3);
         }
 
-        .message-file-preview {
-            background: rgba(124, 58, 237, 0.1);
-            border: 1px solid rgba(124, 58, 237, 0.3);
-            border-radius: 14px;
-            padding: 10px 14px;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .message-file-preview i {
-            font-size: 24px;
-            color: var(--accent-secondary);
-        }
-
         .thinking {
             align-self: flex-start;
             background: rgba(26, 26, 31, 0.6);
@@ -1288,15 +1272,19 @@
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         
-        // MODELOS
-        const VISION_MODEL = 'meta-llama/llama-4-maverick-17b-128e-instruct';
-        const TEXT_MODEL = 'llama-3.3-70b-versatile';
+        // ÚNICO MODELO PARA TODO
+        const MAIN_MODEL = 'meta-llama/llama-4-maverick-17b-128e-instruct';
 
-        // System prompts - TRION VISION ahora es versátil
+        // APIs de búsqueda en internet
+        const WIKIPEDIA_API = 'https://es.wikipedia.org/api/rest_v1/page/summary/';
+        const DUCKDUCKGO_API = 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1';
+        const SEARCH_WIKI = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=%s&format=json&origin=*';
+
+        // System prompts optimizados
         const PROMPTS = {
-            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa la información proporcionada. Tono profesional.",
-            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa la información proporcionada. Tono profesional.",
-            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA. Usa la información proporcionada. Explica conceptos a fondo.",
+            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Tono profesional.",
+            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Tono profesional.",
+            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Explica conceptos a fondo basándote en la información encontrada.",
             vision: "Eres TRION VISION, un asistente AI versátil creado por Hugo Tribaldos que puede analizar imágenes y ayudar con cualquier tarea relacionada. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Cuando recibas una imagen, puedes: 1) Describirla detalladamente 2) Ayudar a crear cartas, documentos o cualquier contenido basado en lo que ves 3) Responder preguntas específicas sobre la imagen 4) Dar consejos o sugerencias 5) Realizar cualquier tarea que el usuario te pida basándote en la imagen. Eres flexible y te adaptas a lo que necesite el usuario. Responde SIEMPRE en español y de forma útil."
         };
 
@@ -1610,13 +1598,6 @@
             return PROMPTS[currentMode];
         }
 
-        function getActiveModel() {
-            if (currentMode === 'vision') {
-                return VISION_MODEL;
-            }
-            return TEXT_MODEL;
-        }
-
         function updateModeUI() {
             document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
             
@@ -1726,13 +1707,13 @@
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
                 <h3>TRION AI</h3>
-                <p>Selecciona <span style="color:#10b981; font-weight:bold;">TRION VISION</span> para trabajar con imágenes</p>
-                <div class="version-badge">v1.6</div>
+                <p>TRION VISION · HTR</p>
+                <div class="version-badge">v1.8</div>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: Texto conciso</span>
-                    <span><i class="fas fa-robot"></i> Normal: Texto equilibrado</span>
-                    <span><i class="fas fa-crown"></i> Pro: Texto detallado</span>
-                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Analiza imágenes y ayuda con cualquier tarea</span>
+                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
+                    <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
+                    <span><i class="fas fa-crown"></i> Pro: Detallado</span>
+                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Imágenes</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1829,43 +1810,83 @@
             updateSidebar();
         };
 
-        // ===== BÚSQUEDA EN WIKIPEDIA =====
-        async function searchWikipedia(query) {
+        // ===== BÚSQUEDA EN INTERNET MEJORADA =====
+        async function searchInternet(query) {
             const cacheKey = query.toLowerCase().trim();
             if (searchCache.has(cacheKey)) {
                 return searchCache.get(cacheKey);
             }
 
             try {
+                // 1. Intentar Wikipedia primero
                 const term = encodeURIComponent(query.toLowerCase().trim());
-                const directResponse = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${term}`);
+                const wikiResponse = await fetch(`${WIKIPEDIA_API}${term}`);
                 
-                if (directResponse.ok) {
-                    const data = await directResponse.json();
-                    if (data.extract && data.extract.length > 100) {
-                        const result = data.extract.substring(0, 1500);
+                if (wikiResponse.ok) {
+                    const wikiData = await wikiResponse.json();
+                    if (wikiData.extract && wikiData.extract.length > 100) {
+                        const result = {
+                            source: 'Wikipedia',
+                            content: wikiData.extract.substring(0, 2000),
+                            title: wikiData.title,
+                            url: wikiData.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${term}`
+                        };
                         searchCache.set(cacheKey, result);
                         return result;
                     }
                 }
 
-                const searchUrl = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${term}&format=json&origin=*`;
+                // 2. Buscar en Wikipedia si no hay resultado directo
+                const searchUrl = SEARCH_WIKI.replace('%s', encodeURIComponent(query));
                 const searchResponse = await fetch(searchUrl);
                 
                 if (searchResponse.ok) {
                     const searchData = await searchResponse.json();
                     if (searchData.query?.search?.length > 0) {
                         const firstTitle = searchData.query.search[0].title;
-                        const pageResponse = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(firstTitle)}`);
+                        const pageResponse = await fetch(`${WIKIPEDIA_API}${encodeURIComponent(firstTitle)}`);
                         
                         if (pageResponse.ok) {
                             const pageData = await pageResponse.json();
                             if (pageData.extract) {
-                                const result = pageData.extract.substring(0, 1500);
+                                const result = {
+                                    source: 'Wikipedia',
+                                    content: pageData.extract.substring(0, 2000),
+                                    title: pageData.title,
+                                    url: pageData.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${encodeURIComponent(firstTitle)}`
+                                };
                                 searchCache.set(cacheKey, result);
                                 return result;
                             }
                         }
+                    }
+                }
+
+                // 3. Intentar DuckDuckGo como respaldo
+                const ddgUrl = DUCKDUCKGO_API.replace('%s', encodeURIComponent(query));
+                const ddgResponse = await fetch(ddgUrl);
+                
+                if (ddgResponse.ok) {
+                    const ddgData = await ddgResponse.json();
+                    if (ddgData.AbstractText) {
+                        const result = {
+                            source: 'DuckDuckGo',
+                            content: ddgData.AbstractText.substring(0, 2000),
+                            title: ddgData.Heading || query,
+                            url: ddgData.AbstractURL || ''
+                        };
+                        searchCache.set(cacheKey, result);
+                        return result;
+                    } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
+                        const topic = ddgData.RelatedTopics[0];
+                        const result = {
+                            source: 'DuckDuckGo',
+                            content: topic.Text?.substring(0, 2000) || '',
+                            title: topic.Text?.split(' - ')[0] || query,
+                            url: topic.FirstURL || ''
+                        };
+                        searchCache.set(cacheKey, result);
+                        return result;
                     }
                 }
 
@@ -1876,7 +1897,7 @@
             }
         }
 
-        // Función para simular delay de procesamiento
+        // Función para delay de 3 segundos
         function delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
@@ -1924,26 +1945,31 @@
             const thinkingMsg = showThinkingMessage();
 
             try {
-                // DELAY DE 5 SEGUNDOS
+                // DELAY DE 3 SEGUNDOS (reducido de 5 a 3)
                 if (currentMode === 'vision') {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO... (5s)';
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO... (3s)';
                 } else {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO... (5s)';
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET... (3s)';
                 }
-                await delay(5000);
+                await delay(3000); // 3 segundos de espera
 
-                // Buscar información solo si NO estamos en modo visión
+                // Buscar información en internet SIEMPRE (excepto en modo visión con imagen)
                 let searchResult = null;
-                if (currentMode !== 'vision' && !hasImage) {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO...';
-                    searchResult = await searchWikipedia(prompt);
+                if (!hasImage) {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO RESULTADOS...';
+                    searchResult = await searchInternet(prompt);
                 }
 
                 const history = chats[currentChatId] || [];
                 let systemPrompt = getActiveSystemPrompt();
                 
+                // Añadir resultados de búsqueda al prompt del sistema
                 if (searchResult) {
-                    systemPrompt += `\n\nInformación actualizada:\n${searchResult}`;
+                    systemPrompt += `\n\nINFORMACIÓN ACTUALIZADA DE INTERNET (${new Date().toLocaleString('es-ES')}):\n`;
+                    systemPrompt += `Fuente: ${searchResult.source}\n`;
+                    systemPrompt += `Título: ${searchResult.title}\n`;
+                    systemPrompt += `Contenido: ${searchResult.content}\n`;
+                    systemPrompt += `\nUsa ESTA información para responder. Es la información más actualizada disponible.`;
                 }
 
                 let messages = [{ role: "system", content: systemPrompt }];
@@ -1980,8 +2006,7 @@
                 const temperature = currentMode === 'rapido' ? 0.3 : currentMode === 'pro' ? 0.8 : 0.6;
                 const maxTokens = currentMode === 'pro' ? 4096 : 2048;
 
-                const modelToUse = getActiveModel();
-
+                // Usar el mismo modelo para todo
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -1989,7 +2014,7 @@
                         'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: modelToUse,
+                        model: MAIN_MODEL,
                         messages: messages,
                         max_tokens: maxTokens,
                         temperature: temperature
