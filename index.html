@@ -502,6 +502,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            transition: all 0.15s ease;
         }
 
         .mode-option:hover {
@@ -514,13 +515,8 @@
             color: white;
         }
 
-        .mode-option.vision-mode {
+        .mode-option.vision-mode.active {
             background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-
-        .mode-option.vision-mode i {
-            color: white;
         }
 
         .btn-clear {
@@ -542,28 +538,7 @@
             color: white;
         }
 
-        .call-button {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            box-shadow: 0 0 25px var(--accent-glow);
-        }
-
-        .call-button.active {
-            background: linear-gradient(135deg, #ef4444, #f97316);
-        }
-
-        .call-button.listening {
-            background: linear-gradient(135deg, #10b981, #34d399);
-        }
+        /* Call button eliminado - quitado completamente */
 
         .chat-box {
             flex: 1;
@@ -848,33 +823,7 @@
             margin-top: 10px;
         }
 
-        .voice-indicator {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 14px 30px;
-            border-radius: 60px;
-            color: white;
-            border: 2px solid var(--accent-primary);
-            box-shadow: 0 0 40px var(--accent-glow);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            white-space: nowrap;
-            font-size: 1rem;
-        }
-
-        .voice-indicator.speaking {
-            border-color: #10b981;
-        }
-
-        .voice-indicator i {
-            font-size: 1.2rem;
-        }
+        /* Voice indicator eliminado (ya no se usa) */
 
         .install-prompt {
             position: fixed;
@@ -1013,11 +962,7 @@
                 gap: 4px;
             }
 
-            .call-button {
-                width: 42px;
-                height: 42px;
-                font-size: 1.1rem;
-            }
+            /* call-button eliminado */
 
             .chat-box {
                 padding: 15px;
@@ -1090,12 +1035,6 @@
                 font-size: 0.85rem;
             }
 
-            .voice-indicator {
-                bottom: 80px;
-                padding: 10px 20px;
-                font-size: 0.85rem;
-            }
-
             .install-prompt {
                 left: 15px;
                 right: 15px;
@@ -1117,12 +1056,6 @@
             .btn-clear {
                 padding: 5px 8px;
                 font-size: 0.7rem;
-            }
-
-            .call-button {
-                width: 38px;
-                height: 38px;
-                font-size: 1rem;
             }
 
             .file-name {
@@ -1217,9 +1150,7 @@
                     </div>
                 </div>
                 <button class="btn-clear" onclick="clearChat()"><i class="fas fa-sparkles"></i> Nuevo</button>
-                <button class="call-button" id="call-button">
-                    <i class="fas fa-phone"></i>
-                </button>
+                <!-- CALL BUTTON ELIMINADO -->
             </div>
         </header>
 
@@ -1280,18 +1211,17 @@
         const DUCKDUCKGO_API = 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1';
         const SEARCH_WIKI = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=%s&format=json&origin=*';
 
-        // System prompts optimizados
+        // System prompts optimizados (AHORA SÍ SE APLICAN SEGÚN EL MODO)
         const PROMPTS = {
-            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Tono profesional.",
-            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Tono profesional.",
-            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Explica conceptos a fondo basándote en la información encontrada.",
+            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Tono profesional y directo.",
+            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil, en unos 3-5 párrafos. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Tono profesional.",
+            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA Y PROFUNDA, desarrollando conceptos a fondo. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Explica con ejemplos si es posible. Tono experto.",
             vision: "Eres TRION VISION, un asistente AI versátil creado por Hugo Tribaldos que puede analizar imágenes y ayudar con cualquier tarea relacionada. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Cuando recibas una imagen, puedes: 1) Describirla detalladamente 2) Ayudar a crear cartas, documentos o cualquier contenido basado en lo que ves 3) Responder preguntas específicas sobre la imagen 4) Dar consejos o sugerencias 5) Realizar cualquier tarea que el usuario te pida basándote en la imagen. Eres flexible y te adaptas a lo que necesite el usuario. Responde SIEMPRE en español y de forma útil."
         };
 
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
-        const callButton = document.getElementById('call-button');
         const statusDiv = document.getElementById('status');
         const selectedModeSpan = document.getElementById('selectedMode');
         const rapidMode = document.getElementById('rapidoMode');
@@ -1310,14 +1240,6 @@
         // Chats
         let chats = {};
         let currentChatId = 'default';
-
-        // Voice
-        let recognition = null;
-        let isCallActive = false;
-        let isSpeaking = false;
-        let autoRestartRecognition = true;
-        let voiceIndicator = null;
-        let preferredVoice = null;
 
         // PWA
         let deferredPrompt = null;
@@ -1429,208 +1351,74 @@
             document.getElementById('chatSidebar').classList.toggle('open');
         };
 
-        // Voice setup
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'es-ES';
-
-            recognition.onstart = () => {
-                callButton.classList.add('listening');
-                callButton.innerHTML = '<i class="fas fa-microphone"></i>';
-                showVoiceIndicator('Escuchando...', false);
-            };
-
-            recognition.onend = () => {
-                callButton.classList.remove('listening');
-                if (!isCallActive) callButton.innerHTML = '<i class="fas fa-phone"></i>';
-                if (voiceIndicator && !isSpeaking) {
-                    voiceIndicator.remove();
-                    voiceIndicator = null;
-                }
-                if (isCallActive && autoRestartRecognition && !isSpeaking) {
-                    setTimeout(() => {
-                        if (isCallActive && !isSpeaking && recognition) {
-                            try { recognition.start(); } catch (e) {}
-                        }
-                    }, 300);
-                }
-            };
-
-            recognition.onresult = async (event) => {
-                const transcript = event.results[0][0].transcript;
-                if (transcript && isCallActive) {
-                    userInput.value = transcript;
-                    try { recognition.stop(); } catch (e) {}
-                    await sendMessage(true);
-                }
-            };
-
-            recognition.onerror = (event) => {
-                if (isCallActive && event.error !== 'no-speech') {
-                    stopCall();
-                }
-            };
-        }
-
-        function getBestVoice() {
-            return new Promise((resolve) => {
-                const voices = speechSynthesis.getVoices();
-                if (voices.length > 0) {
-                    const spanishVoices = voices.filter(v => v.lang.includes('es'));
-                    resolve(spanishVoices[0] || voices[0]);
-                } else {
-                    resolve(null);
-                }
-            });
-        }
-
-        async function speakText(text) {
-            return new Promise(async (resolve) => {
-                if (!window.speechSynthesis) {
-                    resolve();
-                    return;
-                }
-                
-                speechSynthesis.cancel();
-                
-                if (!preferredVoice) {
-                    preferredVoice = await getBestVoice();
-                }
-                
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-ES';
-                utterance.rate = 0.9;
-                utterance.pitch = 1.1;
-                
-                if (preferredVoice) {
-                    utterance.voice = preferredVoice;
-                }
-
-                utterance.onstart = () => {
-                    isSpeaking = true;
-                    callButton.classList.add('active');
-                    callButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-                    showVoiceIndicator('Hablando...', true);
-                };
-
-                utterance.onend = () => {
-                    isSpeaking = false;
-                    callButton.classList.remove('active');
-                    if (isCallActive) {
-                        callButton.classList.add('listening');
-                        callButton.innerHTML = '<i class="fas fa-microphone"></i>';
-                    }
-                    if (voiceIndicator) {
-                        voiceIndicator.remove();
-                        voiceIndicator = null;
-                    }
-                    resolve();
-                };
-
-                utterance.onerror = () => {
-                    isSpeaking = false;
-                    resolve();
-                };
-
-                speechSynthesis.speak(utterance);
-            });
-        }
-
-        function showVoiceIndicator(text, isSpeakingMode) {
-            if (voiceIndicator) voiceIndicator.remove();
-            voiceIndicator = document.createElement('div');
-            voiceIndicator.className = 'voice-indicator' + (isSpeakingMode ? ' speaking' : '');
-            voiceIndicator.innerHTML = `<i class="fas fa-${isSpeakingMode ? 'volume-up' : 'microphone'}"></i> ${text}`;
-            document.body.appendChild(voiceIndicator);
-        }
-
-        async function startCall() {
-            if (!recognition) {
-                alert('Reconocimiento de voz no soportado');
-                return;
-            }
-            try {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
-                isCallActive = true;
-                autoRestartRecognition = true;
-                callButton.classList.add('active', 'listening');
-                callButton.innerHTML = '<i class="fas fa-microphone"></i>';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> LLAMADA';
-                setTimeout(() => {
-                    if (isCallActive && recognition) recognition.start();
-                }, 200);
-            } catch (err) {
-                alert('Permiso de micrófono requerido');
-            }
-        }
-
-        function stopCall() {
-            isCallActive = false;
-            autoRestartRecognition = false;
-            if (recognition) recognition.stop();
-            speechSynthesis.cancel();
-            callButton.classList.remove('active', 'listening');
-            callButton.innerHTML = '<i class="fas fa-phone"></i>';
-            if (voiceIndicator) voiceIndicator.remove();
-            updateModeUI();
-        }
-
-        callButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            isCallActive ? stopCall() : startCall();
-        });
-
-        // Cargar voces
-        if (speechSynthesis) {
-            if (speechSynthesis.getVoices().length > 0) {
-                getBestVoice().then(voice => preferredVoice = voice);
-            } else {
-                speechSynthesis.addEventListener('voiceschanged', () => {
-                    getBestVoice().then(voice => preferredVoice = voice);
-                }, { once: true });
-            }
-        }
-
-        function getActiveSystemPrompt() {
-            return PROMPTS[currentMode];
-        }
-
+        // Función para actualizar UI según el modo
         function updateModeUI() {
+            // Quitar active de todas las opciones
             document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
             
+            // Activar la correspondiente
+            let modeText = '';
+            let statusText = '';
+            let showVisionFileBtn = false;
+
             if (currentMode === 'rapido') {
                 rapidMode.classList.add('active');
-                selectedModeSpan.textContent = 'Rápido';
-                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
-                fileButtons.style.display = 'none';
-                removeFile();
+                modeText = 'Rápido';
+                statusText = 'RÁPIDO';
+                showVisionFileBtn = false;
             } else if (currentMode === 'pro') {
                 proMode.classList.add('active');
-                selectedModeSpan.textContent = 'Pro';
-                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
-                fileButtons.style.display = 'none';
-                removeFile();
+                modeText = 'Pro';
+                statusText = 'PRO';
+                showVisionFileBtn = false;
             } else if (currentMode === 'vision') {
                 visionMode.classList.add('active');
-                selectedModeSpan.textContent = 'TRION VISION';
-                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN';
-                fileButtons.style.display = 'flex';
+                modeText = 'TRION VISION';
+                statusText = 'VISIÓN';
+                showVisionFileBtn = true;
             } else {
                 normalMode.classList.add('active');
-                selectedModeSpan.textContent = 'Normal';
-                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> NORMAL';
-                fileButtons.style.display = 'none';
+                modeText = 'Normal';
+                statusText = 'NORMAL';
+                showVisionFileBtn = false;
+            }
+
+            selectedModeSpan.textContent = modeText;
+            statusDiv.innerHTML = `<i class="fas fa-circle"></i> ${statusText}`;
+            
+            // Mostrar/ocultar botón de adjuntar imagen según modo visión
+            fileButtons.style.display = showVisionFileBtn ? 'flex' : 'none';
+            
+            // Si no estamos en modo visión, eliminar cualquier imagen seleccionada
+            if (!showVisionFileBtn) {
                 removeFile();
             }
         }
 
-        rapidMode.addEventListener('click', () => { currentMode = 'rapido'; updateModeUI(); });
-        normalMode.addEventListener('click', () => { currentMode = 'normal'; updateModeUI(); });
-        proMode.addEventListener('click', () => { currentMode = 'pro'; updateModeUI(); });
-        visionMode.addEventListener('click', () => { currentMode = 'vision'; updateModeUI(); });
+        // Listeners para modos (AHORA SÍ CAMBIAN currentMode y actualizan)
+        rapidMode.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentMode = 'rapido';
+            updateModeUI();
+        });
+        
+        normalMode.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentMode = 'normal';
+            updateModeUI();
+        });
+        
+        proMode.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentMode = 'pro';
+            updateModeUI();
+        });
+        
+        visionMode.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentMode = 'vision';
+            updateModeUI();
+        });
 
         function formatFileSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
@@ -1708,9 +1496,9 @@
             welcomeDiv.innerHTML = `
                 <h3>TRION AI</h3>
                 <p>TRION VISION · HTR</p>
-                <div class="version-badge">v1.8</div>
+                <div class="version-badge">v2.0 (modos fijos)</div>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
+                    <span><i class="fas fa-bolt"></i> Rápido: Conciso (máx 3 frases)</span>
                     <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
                     <span><i class="fas fa-crown"></i> Pro: Detallado</span>
                     <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Imágenes</span>
@@ -1801,7 +1589,6 @@
         }
 
         window.clearChat = function() {
-            if (isCallActive) stopCall();
             chats[currentChatId] = [];
             saveChats();
             chatBox.innerHTML = '';
@@ -1810,7 +1597,7 @@
             updateSidebar();
         };
 
-        // ===== BÚSQUEDA EN INTERNET MEJORADA =====
+        // ===== BÚSQUEDA EN INTERNET =====
         async function searchInternet(query) {
             const cacheKey = query.toLowerCase().trim();
             if (searchCache.has(cacheKey)) {
@@ -1818,7 +1605,7 @@
             }
 
             try {
-                // 1. Intentar Wikipedia primero
+                // 1. Intentar Wikipedia
                 const term = encodeURIComponent(query.toLowerCase().trim());
                 const wikiResponse = await fetch(`${WIKIPEDIA_API}${term}`);
                 
@@ -1897,12 +1684,11 @@
             }
         }
 
-        // Función para delay de 3 segundos
         function delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        async function sendMessage(isVoice = false) {
+        async function sendMessage() {
             const prompt = userInput.value.trim();
             
             const hasImage = !!currentImageBase64;
@@ -1917,9 +1703,6 @@
             }
 
             if (!prompt && !hasImage) {
-                if (isVoice) {
-                    userInput.value = '';
-                }
                 return;
             }
 
@@ -1945,13 +1728,13 @@
             const thinkingMsg = showThinkingMessage();
 
             try {
-                // DELAY DE 3 SEGUNDOS (reducido de 5 a 3)
+                // DELAY DE 3 SEGUNDOS (simula búsqueda)
                 if (currentMode === 'vision') {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO... (3s)';
                 } else {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET... (3s)';
                 }
-                await delay(3000); // 3 segundos de espera
+                await delay(3000);
 
                 // Buscar información en internet SIEMPRE (excepto en modo visión con imagen)
                 let searchResult = null;
@@ -1961,7 +1744,8 @@
                 }
 
                 const history = chats[currentChatId] || [];
-                let systemPrompt = getActiveSystemPrompt();
+                // USAR EL PROMPT ACTIVO SEGÚN currentMode (AHORA SÍ FUNCIONA)
+                let systemPrompt = PROMPTS[currentMode];
                 
                 // Añadir resultados de búsqueda al prompt del sistema
                 if (searchResult) {
@@ -2003,6 +1787,7 @@
                     content: userContent.length === 1 ? userContent[0].text : userContent 
                 });
 
+                // Temperatura y tokens según modo
                 const temperature = currentMode === 'rapido' ? 0.3 : currentMode === 'pro' ? 0.8 : 0.6;
                 const maxTokens = currentMode === 'pro' ? 4096 : 2048;
 
@@ -2038,17 +1823,6 @@
 
                 thinkingMsg.remove();
                 appendMessage('ai', aiResponse, true);
-
-                if (isCallActive) {
-                    autoRestartRecognition = false;
-                    await speakText(aiResponse);
-                    setTimeout(() => {
-                        autoRestartRecognition = true;
-                        if (isCallActive && recognition) {
-                            try { recognition.start(); } catch (e) {}
-                        }
-                    }, 500);
-                }
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -2061,17 +1835,6 @@
                 }
                 
                 appendMessage('ai', errorMessage, true);
-                
-                if (isCallActive) {
-                    autoRestartRecognition = false;
-                    await speakText(errorMessage);
-                    setTimeout(() => {
-                        autoRestartRecognition = true;
-                        if (isCallActive && recognition) {
-                            try { recognition.start(); } catch (e) {}
-                        }
-                    }, 500);
-                }
             } finally {
                 updateModeUI();
             }
@@ -2108,7 +1871,7 @@
 
         // Inicializar
         loadChats();
-        updateModeUI();
+        updateModeUI(); // <-- Aplica el modo inicial y muestra botón solo en visión
 
         // Cerrar sidebar al hacer click fuera en móvil
         document.addEventListener('click', function(e) {
