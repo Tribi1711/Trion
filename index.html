@@ -830,7 +830,7 @@
         .welcome-message {
             text-align: center;
             margin: auto;
-            max-width: 400px;
+            max-width: 450px;
             padding: 40px;
             background: rgba(255, 255, 255, 0.03);
             border-radius: 50px;
@@ -1242,14 +1242,10 @@
         <div id="chat-box" class="chat-box"></div>
 
         <div class="input-area">
-            <div class="file-buttons">
-                <label class="attach-btn" id="vision-attach-btn">
+            <div class="file-buttons" id="fileButtons" style="display: none;">
+                <label class="attach-btn" id="vision-attach-btn" style="border-color: #10b981;">
                     <i class="fas fa-camera"></i>
                     <input type="file" id="imageUpload" accept="image/*">
-                </label>
-                <label class="attach-btn">
-                    <i class="fas fa-file"></i>
-                    <input type="file" id="fileUpload" accept=".txt,.pdf,.doc,.docx,.xls,.xlsx,.csv,.json,.js,.py,.html,.css">
                 </label>
             </div>
             
@@ -1296,12 +1292,12 @@
         const VISION_MODEL = 'meta-llama/llama-4-maverick-17b-128e-instruct';
         const TEXT_MODEL = 'llama-3.3-70b-versatile';
 
-        // System prompts - SIN MENCIONAR LLAMA
+        // System prompts - TRION VISION ahora es versátil
         const PROMPTS = {
             rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa la información proporcionada. Tono profesional.",
             normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa la información proporcionada. Tono profesional.",
             pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA. Usa la información proporcionada. Explica conceptos a fondo.",
-            vision: "Eres TRION VISION, un asistente AI especializado en análisis de imágenes creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Tu ÚNICA función es analizar imágenes. Cuando recibas una imagen, debes: 1) Observar todos los detalles de la imagen 2) Describir qué ves incluyendo objetos, personas, colores, texto, composición 3) Analizar el contexto y propósito de la imagen 4) Responder SIEMPRE en español. No puedes responder preguntas que no estén relacionadas con la imagen. Si no hay imagen, debes decir 'Por favor, sube una imagen para que pueda analizarla'."
+            vision: "Eres TRION VISION, un asistente AI versátil creado por Hugo Tribaldos que puede analizar imágenes y ayudar con cualquier tarea relacionada. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Cuando recibas una imagen, puedes: 1) Describirla detalladamente 2) Ayudar a crear cartas, documentos o cualquier contenido basado en lo que ves 3) Responder preguntas específicas sobre la imagen 4) Dar consejos o sugerencias 5) Realizar cualquier tarea que el usuario te pida basándote en la imagen. Eres flexible y te adaptas a lo que necesite el usuario. Responde SIEMPRE en español y de forma útil."
         };
 
         const chatBox = document.getElementById('chat-box');
@@ -1315,15 +1311,13 @@
         const proMode = document.getElementById('proMode');
         const visionMode = document.getElementById('visionMode');
         const imageUpload = document.getElementById('imageUpload');
-        const fileUpload = document.getElementById('fileUpload');
         const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
+        const fileButtons = document.getElementById('fileButtons');
 
         let currentMode = 'normal';
         let currentImageBase64 = null;
         let currentImageMime = null;
-        let currentFile = null;
-        let currentFileContent = null;
 
         // Chats
         let chats = {};
@@ -1342,10 +1336,6 @@
 
         // Cache de búsquedas
         let searchCache = new Map();
-
-        // Fecha actual para la versión
-        const today = new Date();
-        const versionDate = today.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.');
 
         // Cargar chats
         function loadChats() {
@@ -1634,26 +1624,25 @@
                 rapidMode.classList.add('active');
                 selectedModeSpan.textContent = 'Rápido';
                 if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
-                document.getElementById('vision-attach-btn').style.borderColor = 'var(--border-subtle)';
-                document.getElementById('vision-attach-btn').style.boxShadow = 'none';
+                fileButtons.style.display = 'none';
+                removeFile();
             } else if (currentMode === 'pro') {
                 proMode.classList.add('active');
                 selectedModeSpan.textContent = 'Pro';
                 if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
-                document.getElementById('vision-attach-btn').style.borderColor = 'var(--border-subtle)';
-                document.getElementById('vision-attach-btn').style.boxShadow = 'none';
+                fileButtons.style.display = 'none';
+                removeFile();
             } else if (currentMode === 'vision') {
                 visionMode.classList.add('active');
                 selectedModeSpan.textContent = 'TRION VISION';
                 if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN';
-                document.getElementById('vision-attach-btn').style.borderColor = '#10b981';
-                document.getElementById('vision-attach-btn').style.boxShadow = '0 0 15px #10b981';
+                fileButtons.style.display = 'flex';
             } else {
                 normalMode.classList.add('active');
                 selectedModeSpan.textContent = 'Normal';
                 if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> NORMAL';
-                document.getElementById('vision-attach-btn').style.borderColor = 'var(--border-subtle)';
-                document.getElementById('vision-attach-btn').style.boxShadow = 'none';
+                fileButtons.style.display = 'none';
+                removeFile();
             }
         }
 
@@ -1671,10 +1660,7 @@
         function removeFile() {
             currentImageBase64 = null;
             currentImageMime = null;
-            currentFile = null;
-            currentFileContent = null;
             imageUpload.value = '';
-            fileUpload.value = '';
             fileInfo.style.display = 'none';
         }
         window.removeFile = removeFile;
@@ -1688,15 +1674,6 @@
                 };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
-            });
-        }
-
-        async function readFileAsText(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsText(file);
             });
         }
 
@@ -1717,39 +1694,10 @@
                 currentImageMime = file.type;
                 fileName.textContent = `📷 ${file.name} (${formatFileSize(file.size)})`;
                 fileInfo.style.display = 'flex';
-                
-                if (currentMode === 'vision') {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: IMAGEN LISTA';
-                } else {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> IMAGEN LISTA (cambia a VISIÓN)';
-                }
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: IMAGEN LISTA';
             } catch (error) {
                 alert('Error al leer la imagen');
                 imageUpload.value = '';
-            }
-        });
-
-        fileUpload.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            if (file.size > 10 * 1024 * 1024) {
-                alert('Archivo muy grande (máx 10MB)');
-                fileUpload.value = '';
-                return;
-            }
-
-            removeFile();
-            
-            try {
-                currentFile = file;
-                currentFileContent = await readFileAsText(file);
-                fileName.textContent = `📄 ${file.name} (${formatFileSize(file.size)})`;
-                fileInfo.style.display = 'flex';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> ARCHIVO LISTO';
-            } catch (error) {
-                alert('Error al leer el archivo');
-                fileUpload.value = '';
             }
         });
 
@@ -1763,8 +1711,6 @@
                     if (msg.role === 'user') {
                         if (msg.imageData) {
                             appendUserMessageWithImage(msg.text, msg.imageData, msg.mime, false);
-                        } else if (msg.fileData) {
-                            appendUserMessageWithFile(msg.text, msg.fileName, msg.fileSize, false);
                         } else {
                             appendMessage('user', msg.text, false);
                         }
@@ -1780,13 +1726,13 @@
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
                 <h3>TRION AI</h3>
-                <p>Selecciona <span style="color:#10b981; font-weight:bold;">TRION VISION</span> para analizar imágenes</p>
-                <div class="version-badge">v1.6 · ${versionDate}</div>
+                <p>Selecciona <span style="color:#10b981; font-weight:bold;">TRION VISION</span> para trabajar con imágenes</p>
+                <div class="version-badge">v1.6</div>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
                     <span><i class="fas fa-bolt"></i> Rápido: Texto conciso</span>
                     <span><i class="fas fa-robot"></i> Normal: Texto equilibrado</span>
                     <span><i class="fas fa-crown"></i> Pro: Texto detallado</span>
-                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Análisis de imágenes</span>
+                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Analiza imágenes y ayuda con cualquier tarea</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1860,38 +1806,6 @@
                 saveMessage('user', text, { 
                     imageData: base64Data, 
                     mime: mimeType 
-                });
-            }
-        }
-
-        function appendUserMessageWithFile(text, fileName, fileSize, shouldSave = true) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', 'user');
-            
-            if (text && text.trim()) {
-                const contentDiv = document.createElement('div');
-                contentDiv.textContent = text;
-                msgDiv.appendChild(contentDiv);
-            }
-            
-            const fileDiv = document.createElement('div');
-            fileDiv.className = 'message-file-preview';
-            fileDiv.innerHTML = `
-                <i class="fas fa-file-alt"></i>
-                <div>
-                    <div style="font-weight:500;">${fileName}</div>
-                    <div style="font-size:0.7rem; color:var(--text-secondary);">${fileSize}</div>
-                </div>
-            `;
-            msgDiv.appendChild(fileDiv);
-            
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            if (shouldSave) {
-                saveMessage('user', text, { 
-                    fileName: fileName, 
-                    fileSize: fileSize 
                 });
             }
         }
@@ -1971,18 +1885,17 @@
             const prompt = userInput.value.trim();
             
             const hasImage = !!currentImageBase64;
-            const hasFile = !!currentFile;
 
             // Validaciones específicas para modo visión
             if (currentMode === 'vision') {
                 if (!hasImage) {
-                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda analizarla. Estoy en modo TRION VISION y necesito una imagen para ayudarte.', true);
+                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda ayudarte. Estoy en modo TRION VISION y necesito una imagen para trabajar.', true);
                     userInput.value = '';
                     return;
                 }
             }
 
-            if (!prompt && !hasImage && !hasFile) {
+            if (!prompt && !hasImage) {
                 if (isVoice) {
                     userInput.value = '';
                 }
@@ -1996,8 +1909,6 @@
             // Mostrar mensaje del usuario
             if (hasImage) {
                 appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime, true);
-            } else if (hasFile) {
-                appendUserMessageWithFile(prompt, currentFile.name, formatFileSize(currentFile.size), true);
             } else {
                 appendMessage('user', prompt, true);
             }
@@ -2007,8 +1918,6 @@
 
             const imageToSend = currentImageBase64;
             const mimeToSend = currentImageMime;
-            const fileToSend = currentFile;
-            const fileContentToSend = currentFileContent;
             
             removeFile();
 
@@ -2025,7 +1934,7 @@
 
                 // Buscar información solo si NO estamos en modo visión
                 let searchResult = null;
-                if (currentMode !== 'vision' && !hasImage && !hasFile) {
+                if (currentMode !== 'vision' && !hasImage) {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO...';
                     searchResult = await searchWikipedia(prompt);
                 }
@@ -2041,7 +1950,7 @@
                 
                 const recentHistory = history.slice(-5);
                 for (let msg of recentHistory) {
-                    if (msg.role === 'user' && !msg.imageData && !msg.fileData) {
+                    if (msg.role === 'user' && !msg.imageData) {
                         messages.push({ role: "user", content: msg.text });
                     } else if (msg.role === 'ai') {
                         messages.push({ role: "assistant", content: msg.text });
@@ -2055,25 +1964,11 @@
                 }
                 
                 if (imageToSend) {
-                    if (currentMode === 'vision') {
-                        userContent.push({ 
-                            type: "text", 
-                            text: "Analiza esta imagen en detalle con TRION VISION. Describe todos los elementos que ves: objetos, personas, texto, colores, composición, contexto. Sé exhaustivo en tu análisis." 
-                        });
-                    }
-                    
                     userContent.push({ 
                         type: "image_url", 
                         image_url: { 
                             url: `data:${mimeToSend};base64,${imageToSend}` 
                         } 
-                    });
-                }
-                
-                if (fileToSend && fileContentToSend) {
-                    userContent.push({ 
-                        type: "text", 
-                        text: `Archivo adjunto: ${fileToSend.name}\n\nContenido:\n${fileContentToSend}` 
                     });
                 }
 
@@ -2137,7 +2032,7 @@
                 let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
                 
                 if (currentMode === 'vision') {
-                    errorMessage = '👁️ Error al analizar la imagen. Por favor, intenta de nuevo con otra imagen.';
+                    errorMessage = '👁️ Error al procesar la imagen. Por favor, intenta de nuevo con otra imagen.';
                 }
                 
                 appendMessage('ai', errorMessage, true);
