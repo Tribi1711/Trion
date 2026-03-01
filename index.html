@@ -1237,7 +1237,7 @@
 
             <div class="input-wrapper">
                 <i class="fas fa-chevron-right"></i>
-                <input type="text" id="user-input" placeholder="Pregúntale algo a Trion... (búsqueda automática)">
+                <input type="text" id="user-input" placeholder="Pregúntale algo a Trion...">
             </div>
             <button id="send-btn"><i class="fas fa-paper-plane"></i> Enviar</button>
         </div>
@@ -1268,16 +1268,20 @@
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         
-        // MODELO MÁS ACTUALIZADO (febrero 2026)
-        const BEST_MODEL = 'llama-4-scout';  // 220 tok/s, contexto 256K
+        // MODELO PRINCIPAL
+        const BEST_MODEL = 'llama-3.3-70b-versatile';
+        const FALLBACK_MODEL = 'llama-3.3-70b-versatile';
 
-        // API de búsqueda Wikipedia (más fiable)
-        const WIKIPEDIA_API = 'https://es.wikipedia.org/api/rest_v1/page/summary/';
+        // APIs de búsqueda (múltiples fuentes para mayor fiabilidad)
+        const SEARCH_APIS = {
+            wikipedia: 'https://es.wikipedia.org/api/rest_v1/page/summary/',
+            duckduckgo: 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1'
+        };
 
         const PROMPTS = {
-            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Si tienes información de Wikipedia, úsala. Tono profesional.",
-            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Si tienes información de Wikipedia, úsala. Tono profesional.",
-            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA. Si tienes información de Wikipedia, úsala. Explica conceptos a fondo."
+            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa la información proporcionada. Tono profesional.",
+            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa la información proporcionada. Tono profesional.",
+            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA. Usa la información proporcionada. Explica conceptos a fondo."
         };
 
         const chatBox = document.getElementById('chat-box');
@@ -1314,6 +1318,9 @@
 
         // PWA
         let deferredPrompt = null;
+
+        // Cache de búsquedas para no repetir
+        let searchCache = new Map();
 
         // Cargar chats
         function loadChats() {
@@ -1717,8 +1724,7 @@
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
                 <h3>TRION AI · ${new Date().toLocaleDateString('es-ES')}</h3>
-                <p>Modelo llama-4-scout (febrero 2026) - Búsqueda automática</p>
-                <p style="font-size:0.8rem; color:var(--accent-secondary);">Pregunta lo que quieras, buscaré información actualizada</p>
+                <p>Pregúntame lo que quieras, buscaré información actualizada automáticamente</p>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
                     <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
                     <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
@@ -1848,59 +1854,72 @@
             updateSidebar();
         };
 
-        // Función de búsqueda automática en Wikipedia
-        async function searchWikipedia(query) {
+        // ===== FUNCIÓN DE BÚSQUEDA MEJORADA =====
+        async function searchInformation(query) {
+            // Verificar caché
+            const cacheKey = query.toLowerCase().trim();
+            if (searchCache.has(cacheKey)) {
+                return searchCache.get(cacheKey);
+            }
+
             try {
-                const searchTerm = encodeURIComponent(query.toLowerCase().trim());
-                const response = await fetch(`${WIKIPEDIA_API}${searchTerm}`);
+                // 1. Intentar Wikipedia primero (más fiable)
+                const wikiTerm = encodeURIComponent(query.toLowerCase().trim());
+                const wikiResponse = await fetch(`${SEARCH_APIS.wikipedia}${wikiTerm}`);
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.extract) {
-                        return {
-                            title: data.title,
-                            extract: data.extract,
-                            url: data.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${searchTerm}`
-                        };
+                if (wikiResponse.ok) {
+                    const wikiData = await wikiResponse.json();
+                    if (wikiData.extract) {
+                        const result = wikiData.extract.substring(0, 1000);
+                        searchCache.set(cacheKey, result);
+                        return result;
                     }
                 }
+
+                // 2. Si Wikipedia falla, intentar búsqueda en Wikipedia
+                const searchResponse = await fetch(
+                    `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${wikiTerm}&format=json&origin=*`
+                );
                 
-                // Si no encuentra exacto, busca páginas relacionadas
-                const searchResponse = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${searchTerm}&format=json&origin=*`);
-                const searchData = await searchResponse.json();
-                
-                if (searchData.query?.search?.length > 0) {
-                    const firstResult = searchData.query.search[0];
-                    const pageResponse = await fetch(`${WIKIPEDIA_API}${encodeURIComponent(firstResult.title)}`);
-                    const pageData = await pageResponse.json();
-                    
-                    if (pageData.extract) {
-                        return {
-                            title: pageData.title,
-                            extract: pageData.extract,
-                            url: pageData.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${encodeURIComponent(firstResult.title)}`
-                        };
+                if (searchResponse.ok) {
+                    const searchData = await searchResponse.json();
+                    if (searchData.query?.search?.length > 0) {
+                        const firstTitle = searchData.query.search[0].title;
+                        const pageResponse = await fetch(`${SEARCH_APIS.wikipedia}${encodeURIComponent(firstTitle)}`);
+                        
+                        if (pageResponse.ok) {
+                            const pageData = await pageResponse.json();
+                            if (pageData.extract) {
+                                const result = pageData.extract.substring(0, 1000);
+                                searchCache.set(cacheKey, result);
+                                return result;
+                            }
+                        }
                     }
                 }
+
+                // 3. Si todo falla, usar DuckDuckGo como respaldo
+                const ddgUrl = SEARCH_APIS.duckduckgo.replace('%s', encodeURIComponent(query));
+                const ddgResponse = await fetch(ddgUrl);
                 
+                if (ddgResponse.ok) {
+                    const ddgData = await ddgResponse.json();
+                    if (ddgData.AbstractText) {
+                        const result = ddgData.AbstractText.substring(0, 1000);
+                        searchCache.set(cacheKey, result);
+                        return result;
+                    } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
+                        const result = ddgData.RelatedTopics[0].Text?.substring(0, 1000) || '';
+                        searchCache.set(cacheKey, result);
+                        return result;
+                    }
+                }
+
                 return null;
-            } catch (e) {
-                console.error('Error en búsqueda Wikipedia:', e);
+            } catch (error) {
+                console.error('Error en búsqueda:', error);
                 return null;
             }
-        }
-
-        // Detectar si necesita búsqueda actual
-        function needsCurrentInfo(query) {
-            const currentTerms = [
-                'actual', 'hoy', 'ahora', '2026', '2025', '2024', 'reciente', 'último', 'última',
-                'noticia', 'novedad', 'nuevo', 'lanzamiento', 'sale', 'estreno', 'próximo',
-                'fecha', 'cuándo', 'qué pasó', 'quién ganó', 'resultado', 'partido', 'elección',
-                'precio', 'valor', 'cotización', 'dólar', 'euro', 'bitcoin', 'cripto'
-            ];
-            
-            const lowerQuery = query.toLowerCase();
-            return currentTerms.some(term => lowerQuery.includes(term));
         }
 
         async function sendMessage(isVoice = false) {
@@ -1938,25 +1957,21 @@
             const thinkingMsg = showThinkingMessage();
 
             try {
-                // Buscar información actual si es relevante
-                let wikiInfo = null;
-                let needsSearch = needsCurrentInfo(prompt) || prompt.length > 10;
-                
-                if (needsSearch) {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO...';
-                    wikiInfo = await searchWikipedia(prompt);
-                }
+                // SIEMPRE buscar información actualizada ANTES de responder
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO...';
+                let searchResult = await searchInformation(prompt);
 
                 const history = chats[currentChatId] || [];
                 let systemPrompt = getActiveSystemPrompt();
                 
-                if (wikiInfo) {
-                    systemPrompt += `\n\nInformación de Wikipedia (${new Date().toLocaleString('es-ES')}):\nTítulo: ${wikiInfo.title}\nResumen: ${wikiInfo.extract}\nFuente: ${wikiInfo.url}`;
+                // Añadir la información encontrada al prompt del sistema
+                if (searchResult) {
+                    systemPrompt += `\n\nInformación actualizada relevante:\n${searchResult}`;
                 }
 
                 let messages = [{ role: "system", content: systemPrompt }];
                 
-                const recentHistory = history.slice(-8);
+                const recentHistory = history.slice(-6); // Menos historial para más info actual
                 for (let msg of recentHistory) {
                     if (msg.role === 'user' && !msg.imageData && !msg.fileData) {
                         messages.push({ role: "user", content: msg.text });
@@ -2010,67 +2025,17 @@
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.text();
-                    console.error('Error API:', errorData);
-                    
-                    // Si hay error con el modelo, usar el modelo normal como fallback
-                    if (response.status === 404) {
-                        const fallbackResponse = await fetch(API_URL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${API_KEY}`
-                            },
-                            body: JSON.stringify({
-                                model: 'llama-3.3-70b-versatile',
-                                messages: messages,
-                                max_tokens: maxTokens,
-                                temperature: temperature
-                            })
-                        });
-                        
-                        if (!fallbackResponse.ok) throw new Error('Error con ambos modelos');
-                        
-                        const fallbackData = await fallbackResponse.json();
-                        let aiResponse = fallbackData.choices[0].message.content.replace(/[*]/g, '').trim();
-                        
-                        if (wikiInfo) {
-                            aiResponse = `📚 Información actualizada (vía Wikipedia)\n\n` + aiResponse;
-                        }
-                        
-                        thinkingMsg.remove();
-                        appendMessage('ai', aiResponse, true);
-                        
-                        if (isCallActive) {
-                            autoRestartRecognition = false;
-                            await speakText(aiResponse);
-                            setTimeout(() => {
-                                autoRestartRecognition = true;
-                                if (isCallActive && recognition) {
-                                    try { recognition.start(); } catch (e) {}
-                                }
-                            }, 500);
-                        }
-                        
-                        updateModeUI();
-                        return;
-                    }
-                    
                     throw new Error(`Error ${response.status}`);
                 }
                 
                 const data = await response.json();
                 
                 if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                    throw new Error('Respuesta inválida de la API');
+                    throw new Error('Respuesta inválida');
                 }
                 
                 let aiResponse = data.choices[0].message.content;
                 aiResponse = aiResponse.replace(/[*]/g, '').trim();
-
-                if (wikiInfo) {
-                    aiResponse = `📚 Información actualizada (vía Wikipedia)\n\n` + aiResponse;
-                }
 
                 thinkingMsg.remove();
                 appendMessage('ai', aiResponse, true);
@@ -2092,9 +2057,13 @@
                 
                 let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
                 
-                // Intentar con modelo de respaldo
+                // Último recurso: responder sin búsqueda
                 try {
-                    const messages = [{ role: "system", content: getActiveSystemPrompt() }, { role: "user", content: prompt }];
+                    const messages = [
+                        { role: "system", content: getActiveSystemPrompt() },
+                        { role: "user", content: prompt }
+                    ];
+                    
                     const fallbackResponse = await fetch(API_URL, {
                         method: 'POST',
                         headers: {
@@ -2102,7 +2071,7 @@
                             'Authorization': `Bearer ${API_KEY}`
                         },
                         body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
+                            model: FALLBACK_MODEL,
                             messages: messages,
                             max_tokens: 2048,
                             temperature: 0.6
@@ -2176,7 +2145,7 @@
         });
     })();
 </script>
-    <script>
+     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js');
