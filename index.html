@@ -13,7 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* (Mantén el mismo CSS que antes) */
         * {
             margin: 0;
             padding: 0;
@@ -1273,12 +1272,15 @@
         const VISION_MODEL = 'llama-3.2-11b-vision-preview';  // Modelo con visión
         const TEXT_MODEL = 'llama-3.3-70b-versatile';         // Modelo de texto
 
-        // System prompts
+        // System prompts MEJORADOS para visión
         const PROMPTS = {
             rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa la información proporcionada. Tono profesional.",
             normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa la información proporcionada. Tono profesional.",
             pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA. Usa la información proporcionada. Explica conceptos a fondo."
         };
+
+        // Prompt específico para análisis de imágenes
+        const VISION_PROMPT = "Eres Trion, un experto en análisis de imágenes. Vas a analizar esta imagen con mucho detalle. Tómate tu tiempo para observar todos los elementos: objetos, personas, texto, colores, composición, y contexto. Proporciona una descripción completa y precisa de lo que ves.";
 
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
@@ -1904,6 +1906,11 @@
             }
         }
 
+        // Función para simular delay de procesamiento
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         async function sendMessage(isVoice = false) {
             const prompt = userInput.value.trim();
             
@@ -1944,6 +1951,10 @@
             const thinkingMsg = showThinkingMessage();
 
             try {
+                // SIMULAR DELAY DE 5 SEGUNDOS PARA MEJOR PROCESAMIENTO
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO... (5s)';
+                await delay(5000); // 5 segundos de espera
+
                 // Buscar información actualizada SIEMPRE (excepto si hay imagen)
                 let searchResult = null;
                 if (!hasImage && !hasFile) {
@@ -1979,8 +1990,12 @@
                     userContent.push({ type: "text", text: prompt });
                 }
                 
-                // Si hay imagen, usar formato correcto para visión
+                // Si hay imagen, usar formato correcto para visión con prompt específico
                 if (imageToSend) {
+                    // Añadir instrucciones específicas para análisis de imagen
+                    const visionInstructions = VISION_PROMPT;
+                    userContent.push({ type: "text", text: visionInstructions });
+                    
                     userContent.push({ 
                         type: "image_url", 
                         image_url: { 
