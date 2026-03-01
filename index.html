@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TRION · AI v2.0</title>
-    <meta name="description" content="Asistente AI con búsqueda en internet real">
+    <title>TRION · AI</title>
+    <meta name="description" content="Asistente AI con búsqueda en internet">
     <meta name="theme-color" content="#7c3aed">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -90,6 +90,14 @@
             overflow: hidden;
         }
 
+        .splash-logo img {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            display: block;
+        }
+
         .splash-logo i {
             font-size: 75px;
             color: white;
@@ -104,14 +112,6 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
             letter-spacing: 2px;
-        }
-
-        .splash-version {
-            color: var(--accent-secondary);
-            font-size: 1.2rem;
-            margin-top: -10px;
-            margin-bottom: 20px;
-            font-family: var(--font-display);
         }
 
         .splash-loader span {
@@ -190,6 +190,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+        }
+
+        .sidebar-logo img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            display: block;
         }
 
         .sidebar-logo i {
@@ -388,6 +397,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            display: block;
         }
 
         .logo i {
@@ -501,6 +519,10 @@
             color: white;
         }
 
+        .mode-option.vision-mode i {
+            color: white;
+        }
+
         .btn-clear {
             background: rgba(255, 255, 255, 0.03);
             color: var(--text-secondary);
@@ -597,6 +619,14 @@
             margin-bottom: 8px;
         }
 
+        .ai .message-header img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            display: block;
+        }
+
         .ai .message-header i {
             font-size: 16px;
             color: var(--accent-secondary);
@@ -607,6 +637,14 @@
             font-weight: 600;
             color: var(--accent-secondary);
             text-transform: uppercase;
+        }
+
+        .message-image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 18px;
+            margin-top: 10px;
+            border: 2px solid rgba(124, 58, 237, 0.3);
         }
 
         .thinking {
@@ -677,6 +715,43 @@
 
         .attach-btn input {
             display: none;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 40px;
+            padding: 6px 16px;
+            animation: slideIn 0.2s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .file-name {
+            font-size: 0.8rem;
+            color: var(--accent-secondary);
+            max-width: 200px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .file-remove {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .input-wrapper {
@@ -763,20 +838,14 @@
 
         .version-badge {
             display: inline-block;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: white;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
             padding: 4px 12px;
             border-radius: 40px;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 500;
+            border: 1px solid rgba(16, 185, 129, 0.3);
             margin-top: 10px;
-        }
-
-        .search-info {
-            font-size: 0.7rem;
-            color: var(--accent-secondary);
-            margin-top: 5px;
-            font-style: italic;
         }
 
         .voice-indicator {
@@ -913,6 +982,11 @@
                 height: 40px;
             }
 
+            .logo img {
+                width: 24px;
+                height: 24px;
+            }
+
             .logo i {
                 font-size: 24px;
             }
@@ -971,6 +1045,16 @@
                 font-size: 1.1rem;
             }
 
+            .file-info {
+                padding: 4px 12px;
+                gap: 6px;
+            }
+
+            .file-name {
+                font-size: 0.7rem;
+                max-width: 120px;
+            }
+
             .input-wrapper {
                 min-width: 100px;
             }
@@ -1019,17 +1103,49 @@
                 padding: 15px;
             }
         }
+
+        @media (max-width: 380px) {
+            .brand h1 {
+                font-size: 1.1rem;
+            }
+
+            .mode-dropdown-btn {
+                padding: 5px 8px;
+                font-size: 0.7rem;
+            }
+
+            .btn-clear {
+                padding: 5px 8px;
+                font-size: 0.7rem;
+            }
+
+            .call-button {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+            }
+
+            .file-name {
+                max-width: 80px;
+            }
+
+            button#send-btn {
+                min-width: 60px;
+                padding: 0 10px;
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
 
+<!-- Splash Screen -->
 <div class="splash-screen" id="splashScreen">
     <div class="splash-content">
         <div class="splash-logo">
-            <i class="fas fa-brain"></i>
+            <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
         </div>
         <h1 class="splash-title">TRION</h1>
-        <div class="splash-version">v2.0</div>
         <div class="splash-loader">
             <span></span>
             <span></span>
@@ -1038,11 +1154,13 @@
     </div>
 </div>
 
+<!-- App container -->
 <div class="app-container">
+    <!-- Sidebar -->
     <div class="chat-sidebar" id="chatSidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <i class="fas fa-brain"></i>
+                <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
             </div>
             <h2>Historial</h2>
             <button class="new-chat-btn" onclick="createNewChat()">
@@ -1064,6 +1182,7 @@
         </div>
     </div>
 
+    <!-- Chat container -->
     <div class="chat-container">
         <header>
             <div class="brand">
@@ -1071,7 +1190,7 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo">
-                    <i class="fas fa-brain"></i>
+                    <img src="logo.png" alt="TRION" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-brain\'></i>';">
                 </div>
                 <h1>TRION</h1>
                 <span id="status"><i class="fas fa-circle"></i> NORMAL</span>
@@ -1129,10 +1248,11 @@
     </div>
 </div>
 
+<!-- Install prompt -->
 <div class="install-prompt" id="installPrompt">
     <i class="fas fa-download"></i>
     <div class="install-prompt-content">
-        <h4>Instalar TRION v2.0</h4>
+        <h4>Instalar TRION</h4>
         <p>Instala como app para acceso rápido</p>
     </div>
     <button onclick="installPWA()" id="installBtn">Instalar</button>
@@ -1143,24 +1263,29 @@
 
 <script>
     (function() {
+        // Splash screen
         setTimeout(() => {
             document.getElementById('splashScreen').classList.add('fade-out');
         }, 2000);
 
+        // ===== CONFIGURACIÓN =====
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-        const MAIN_MODEL = 'llama-3.3-70b-versatile';
+        
+        // ÚNICO MODELO PARA TODO
+        const MAIN_MODEL = 'meta-llama/llama-4-maverick-17b-128e-instruct';
 
-        // APIs de búsqueda mejoradas
-        const DUCKDUCKGO_API = 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1';
+        // APIs de búsqueda en internet
         const WIKIPEDIA_API = 'https://es.wikipedia.org/api/rest_v1/page/summary/';
+        const DUCKDUCKGO_API = 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&skip_disambig=1';
         const SEARCH_WIKI = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=%s&format=json&origin=*';
 
+        // System prompts optimizados
         const PROMPTS = {
-            rapido: "Eres Trion v2.0, un asistente AI con CONOCIMIENTO ACTUALIZADO DE INTERNET. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: Usa SIEMPRE la información de búsqueda proporcionada para responder. Si no hay información de búsqueda, di que no tienes información actualizada. Responde de forma MUY CONCISA, máximo 2-3 frases. Tono profesional y directo.",
-            normal: "Eres Trion v2.0, un asistente AI con CONOCIMIENTO ACTUALIZADO DE INTERNET. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: Usa SIEMPRE la información de búsqueda proporcionada. No uses conocimiento propio, solo la información de búsqueda. Responde de forma clara y útil basándote en los resultados. Tono profesional.",
-            pro: "Eres Trion v2.0, un asistente AI con CONOCIMIENTO ACTUALIZADO DE INTERNET. Hoy es " + new Date().toLocaleDateString('es-ES') + ". IMPORTANTE: Usa EXCLUSIVAMENTE la información de búsqueda proporcionada. Da respuestas DETALLADAS y bien estructuradas basadas en los resultados. Explica conceptos a fondo usando la información encontrada.",
-            vision: "Eres TRION VISION v2.0, un asistente AI que analiza imágenes. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Cuando recibas una imagen: 1) Describe lo que ves 2) Responde preguntas sobre la imagen. No uses internet para imágenes, solo describe lo que ves. Responde SIEMPRE en español."
+            rapido: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma MUY CONCISA, máximo 2-3 frases. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Tono profesional.",
+            normal: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma clara y útil. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Tono profesional.",
+            pro: "Eres Trion, un asistente AI experto creado por Hugo Tribaldos con acceso a internet. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Responde de forma DETALLADA. Usa SIEMPRE la información de búsqueda proporcionada para dar datos actualizados y precisos. Explica conceptos a fondo basándote en la información encontrada.",
+            vision: "Eres TRION VISION, un asistente AI versátil creado por Hugo Tribaldos que puede analizar imágenes y ayudar con cualquier tarea relacionada. Hoy es " + new Date().toLocaleDateString('es-ES') + ". Cuando recibas una imagen, puedes: 1) Describirla detalladamente 2) Ayudar a crear cartas, documentos o cualquier contenido basado en lo que ves 3) Responder preguntas específicas sobre la imagen 4) Dar consejos o sugerencias 5) Realizar cualquier tarea que el usuario te pida basándote en la imagen. Eres flexible y te adaptas a lo que necesite el usuario. Responde SIEMPRE en español y de forma útil."
         };
 
         const chatBox = document.getElementById('chat-box');
@@ -1181,351 +1306,29 @@
         let currentMode = 'normal';
         let currentImageBase64 = null;
         let currentImageMime = null;
+
+        // Chats
         let chats = {};
         let currentChatId = 'default';
-        let conversationMemory = [];
+
+        // Voice
+        let recognition = null;
+        let isCallActive = false;
+        let isSpeaking = false;
+        let autoRestartRecognition = true;
+        let voiceIndicator = null;
+        let preferredVoice = null;
+
+        // PWA
+        let deferredPrompt = null;
+
+        // Cache de búsquedas
         let searchCache = new Map();
 
-        // Sistema de memoria mejorado - guarda contexto de conversación
-        function updateConversationMemory(role, content) {
-            conversationMemory.push({ role, content, timestamp: Date.now() });
-            if (conversationMemory.length > 20) {
-                conversationMemory = conversationMemory.slice(-20);
-            }
-            // Guardar en localStorage para persistencia
-            localStorage.setItem('trion_memory_' + currentChatId, JSON.stringify(conversationMemory));
-        }
-
-        function loadConversationMemory() {
-            try {
-                const saved = localStorage.getItem('trion_memory_' + currentChatId);
-                if (saved) {
-                    conversationMemory = JSON.parse(saved);
-                } else {
-                    conversationMemory = [];
-                }
-            } catch (e) {
-                conversationMemory = [];
-            }
-        }
-
-        // Búsqueda en internet REAL
-        async function searchInternet(query) {
-            const cacheKey = query.toLowerCase().trim();
-            if (searchCache.has(cacheKey)) {
-                console.log('Usando caché para:', query);
-                return searchCache.get(cacheKey);
-            }
-
-            statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET...';
-            
-            try {
-                // 1. Buscar en Wikipedia primero
-                const searchUrl = SEARCH_WIKI.replace('%s', encodeURIComponent(query));
-                const searchResponse = await fetch(searchUrl);
-                
-                if (searchResponse.ok) {
-                    const searchData = await searchResponse.json();
-                    if (searchData.query?.search?.length > 0) {
-                        const firstTitle = searchData.query.search[0].title;
-                        const pageResponse = await fetch(`${WIKIPEDIA_API}${encodeURIComponent(firstTitle)}`);
-                        
-                        if (pageResponse.ok) {
-                            const pageData = await pageResponse.json();
-                            if (pageData.extract) {
-                                const result = {
-                                    source: 'Wikipedia',
-                                    content: pageData.extract,
-                                    title: pageData.title,
-                                    url: pageData.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${encodeURIComponent(firstTitle)}`
-                                };
-                                searchCache.set(cacheKey, result);
-                                return result;
-                            }
-                        }
-                    }
-                }
-
-                // 2. Intentar DuckDuckGo
-                const ddgUrl = DUCKDUCKGO_API.replace('%s', encodeURIComponent(query));
-                const ddgResponse = await fetch(ddgUrl);
-                
-                if (ddgResponse.ok) {
-                    const ddgData = await ddgResponse.json();
-                    
-                    // AbstractText es la mejor opción
-                    if (ddgData.AbstractText) {
-                        const result = {
-                            source: 'DuckDuckGo',
-                            content: ddgData.AbstractText,
-                            title: ddgData.Heading || query,
-                            url: ddgData.AbstractURL || ''
-                        };
-                        searchCache.set(cacheKey, result);
-                        return result;
-                    }
-                    
-                    // Si no hay Abstract, buscar en RelatedTopics
-                    if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
-                        let content = '';
-                        for (let i = 0; i < Math.min(3, ddgData.RelatedTopics.length); i++) {
-                            const topic = ddgData.RelatedTopics[i];
-                            if (topic.Text) {
-                                content += topic.Text + '\n';
-                            }
-                        }
-                        if (content) {
-                            const result = {
-                                source: 'DuckDuckGo',
-                                content: content,
-                                title: query,
-                                url: ''
-                            };
-                            searchCache.set(cacheKey, result);
-                            return result;
-                        }
-                    }
-                }
-
-                // 3. Si no se encuentra nada
-                return {
-                    source: 'Sin resultados',
-                    content: 'No se encontró información actualizada sobre esta consulta.',
-                    title: query,
-                    url: ''
-                };
-                
-            } catch (error) {
-                console.error('Error en búsqueda:', error);
-                return {
-                    source: 'Error',
-                    content: 'Error al buscar información en internet.',
-                    title: query,
-                    url: ''
-                };
-            }
-        }
-
-        // Función para procesar la respuesta
-        async function sendMessage() {
-            const prompt = userInput.value.trim();
-            
-            if (!prompt && !currentImageBase64) {
-                return;
-            }
-
-            // Eliminar mensaje de bienvenida si existe
-            if (document.querySelector('.welcome-message')) {
-                document.querySelector('.welcome-message').remove();
-            }
-
-            // Mostrar mensaje del usuario
-            if (currentImageBase64) {
-                appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime);
-            } else {
-                appendMessage('user', prompt);
-            }
-
-            const imageToSend = currentImageBase64;
-            const mimeToSend = currentImageMime;
-            removeFile();
-
-            const thinkingMsg = showThinkingMessage();
-
-            try {
-                let searchResult = null;
-                
-                // Solo buscar en internet si no es modo visión o si es modo visión sin imagen
-                if (currentMode !== 'vision' || !imageToSend) {
-                    searchResult = await searchInternet(prompt);
-                    
-                    // Mostrar fuente en status
-                    if (searchResult && searchResult.source !== 'Sin resultados' && searchResult.source !== 'Error') {
-                        statusDiv.innerHTML = `<i class="fas fa-circle"></i> FUENTE: ${searchResult.source}`;
-                    }
-                }
-
-                // Cargar memoria de la conversación
-                loadConversationMemory();
-
-                // Construir mensajes con memoria
-                let messages = [{ 
-                    role: "system", 
-                    content: PROMPTS[currentMode] + (searchResult ? 
-                        `\n\nINFORMACIÓN ACTUAL DE INTERNET (${new Date().toLocaleString()}):\nFuente: ${searchResult.source}\nTítulo: ${searchResult.title}\nContenido: ${searchResult.content}` : 
-                        (currentMode !== 'vision' ? '\n\nNo se encontró información actualizada en internet.' : ''))
-                }];
-
-                // Añadir memoria de conversación (últimos 10 mensajes)
-                const recentMemory = conversationMemory.slice(-10);
-                for (let msg of recentMemory) {
-                    if (msg.role === 'user' || msg.role === 'assistant') {
-                        messages.push({ role: msg.role, content: msg.content });
-                    }
-                }
-
-                // Añadir mensaje actual
-                let userContent = [];
-                if (prompt) {
-                    userContent.push({ type: "text", text: prompt });
-                }
-                if (imageToSend) {
-                    userContent.push({ 
-                        type: "image_url", 
-                        image_url: { 
-                            url: `data:${mimeToSend};base64,${imageToSend}` 
-                        } 
-                    });
-                }
-
-                messages.push({ 
-                    role: "user", 
-                    content: userContent.length === 1 ? userContent[0].text : userContent 
-                });
-
-                const temperature = currentMode === 'rapido' ? 0.2 : currentMode === 'pro' ? 0.7 : 0.4;
-                const maxTokens = currentMode === 'pro' ? 4096 : 2048;
-
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: MAIN_MODEL,
-                        messages: messages,
-                        max_tokens: maxTokens,
-                        temperature: temperature
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                    throw new Error('Respuesta inválida');
-                }
-                
-                let aiResponse = data.choices[0].message.content;
-                
-                // Limpiar formato
-                aiResponse = aiResponse.replace(/[*]/g, '').trim();
-
-                thinkingMsg.remove();
-                appendMessage('ai', aiResponse);
-
-                // Guardar en memoria
-                updateConversationMemory('user', prompt);
-                updateConversationMemory('assistant', aiResponse);
-
-                // Si hay fuente, añadir nota
-                if (searchResult && searchResult.source !== 'Sin resultados' && searchResult.source !== 'Error' && currentMode !== 'vision') {
-                    const sourceNote = document.createElement('div');
-                    sourceNote.className = 'search-info';
-                    sourceNote.innerHTML = `Fuente: ${searchResult.source} · ${new Date().toLocaleTimeString()}`;
-                    chatBox.appendChild(sourceNote);
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-                thinkingMsg.remove();
-                
-                let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
-                if (currentMode === 'vision') {
-                    errorMessage = '👁️ Error al procesar la imagen. Por favor, intenta de nuevo.';
-                }
-                
-                appendMessage('ai', errorMessage);
-            } finally {
-                userInput.value = '';
-                updateModeUI();
-            }
-        }
-
-        // Funciones auxiliares
-        function appendMessage(role, text) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', role);
-            
-            if (role === 'ai') {
-                const header = document.createElement('div');
-                header.classList.add('message-header');
-                
-                const icon = document.createElement('i');
-                icon.className = 'fas fa-brain';
-                
-                const span = document.createElement('span');
-                span.textContent = currentMode === 'vision' ? 'TRION VISION v2.0' : 'TRION v2.0';
-                if (currentMode === 'vision') {
-                    span.style.color = '#10b981';
-                }
-                
-                header.appendChild(icon);
-                header.appendChild(span);
-                msgDiv.appendChild(header);
-            }
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.innerHTML = text.replace(/\n/g, '<br>');
-            msgDiv.appendChild(contentDiv);
-            
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            // Guardar en chats
-            if (!chats[currentChatId]) chats[currentChatId] = [];
-            chats[currentChatId].push({ role, text });
-            saveChats();
-        }
-
-        function appendUserMessageWithImage(text, base64Data, mimeType) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', 'user');
-            
-            if (text && text.trim()) {
-                const contentDiv = document.createElement('div');
-                contentDiv.textContent = text;
-                msgDiv.appendChild(contentDiv);
-            }
-            
-            const img = document.createElement('img');
-            img.src = `data:${mimeType};base64,${base64Data}`;
-            img.style.maxWidth = '200px';
-            img.style.maxHeight = '200px';
-            img.style.borderRadius = '12px';
-            img.style.marginTop = '10px';
-            msgDiv.appendChild(img);
-            
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            // Guardar en chats
-            if (!chats[currentChatId]) chats[currentChatId] = [];
-            chats[currentChatId].push({ role: 'user', text, imageData: base64Data, mime: mimeType });
-            saveChats();
-        }
-
-        function showThinkingMessage() {
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.classList.add('thinking');
-            thinkingDiv.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div>';
-            chatBox.appendChild(thinkingDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return thinkingDiv;
-        }
-
-        function saveChats() {
-            localStorage.setItem('trion_chats_v2', JSON.stringify(chats));
-        }
-
+        // Cargar chats
         function loadChats() {
             try {
-                const saved = localStorage.getItem('trion_chats_v2');
+                const saved = localStorage.getItem('trion_chats');
                 chats = saved ? JSON.parse(saved) : { default: [] };
                 if (!chats[currentChatId]) currentChatId = 'default';
                 loadHistory();
@@ -1535,76 +1338,9 @@
             }
         }
 
-        function loadHistory() {
-            const history = chats[currentChatId] || [];
-            chatBox.innerHTML = '';
-            if (history.length === 0) {
-                showWelcomeMessage();
-            } else {
-                history.forEach(msg => {
-                    if (msg.role === 'user') {
-                        if (msg.imageData) {
-                            const msgDiv = document.createElement('div');
-                            msgDiv.classList.add('message', 'user');
-                            if (msg.text) {
-                                const contentDiv = document.createElement('div');
-                                contentDiv.textContent = msg.text;
-                                msgDiv.appendChild(contentDiv);
-                            }
-                            const img = document.createElement('img');
-                            img.src = `data:${msg.mime};base64,${msg.imageData}`;
-                            img.style.maxWidth = '200px';
-                            img.style.maxHeight = '200px';
-                            img.style.borderRadius = '12px';
-                            img.style.marginTop = '10px';
-                            msgDiv.appendChild(img);
-                            chatBox.appendChild(msgDiv);
-                        } else {
-                            appendMessage('user', msg.text, false);
-                        }
-                    } else {
-                        const msgDiv = document.createElement('div');
-                        msgDiv.classList.add('message', 'ai');
-                        
-                        const header = document.createElement('div');
-                        header.classList.add('message-header');
-                        
-                        const icon = document.createElement('i');
-                        icon.className = 'fas fa-brain';
-                        
-                        const span = document.createElement('span');
-                        span.textContent = 'TRION v2.0';
-                        
-                        header.appendChild(icon);
-                        header.appendChild(span);
-                        msgDiv.appendChild(header);
-                        
-                        const contentDiv = document.createElement('div');
-                        contentDiv.innerHTML = msg.text.replace(/\n/g, '<br>');
-                        msgDiv.appendChild(contentDiv);
-                        
-                        chatBox.appendChild(msgDiv);
-                    }
-                });
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-
-        function showWelcomeMessage() {
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.classList.add('welcome-message');
-            welcomeDiv.innerHTML = `
-                <h3>TRION v2.0</h3>
-                <p>Asistente con búsqueda en internet real y memoria</p>
-                <div class="version-badge">v2.0</div>
-                <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
-                    <span><i class="fas fa-bolt"></i> Rápido: Conciso, solo internet</span>
-                    <span><i class="fas fa-robot"></i> Normal: Equilibrado, internet</span>
-                    <span><i class="fas fa-crown"></i> Pro: Detallado, internet</span>
-                    <span><i class="fas fa-eye" style="color:#10b981;"></i> Visión: Análisis de imágenes</span>
-                </span>
-            `;
-            chatBox.appendChild(welcomeDiv);
+        function saveChats() {
+            localStorage.setItem('trion_chats', JSON.stringify(chats));
+            updateSidebar();
         }
 
         function updateSidebar() {
@@ -1643,13 +1379,11 @@
             if (Object.keys(chats).length === 1) return;
             
             delete chats[chatId];
-            localStorage.removeItem('trion_memory_' + chatId);
             if (currentChatId === chatId) {
                 currentChatId = Object.keys(chats)[0];
                 loadHistory();
             }
             saveChats();
-            updateSidebar();
         };
 
         window.switchChat = function(chatId) {
@@ -1667,7 +1401,6 @@
             currentChatId = newId;
             saveChats();
             loadHistory();
-            updateSidebar();
             if (window.innerWidth <= 768) {
                 document.getElementById('chatSidebar').classList.remove('open');
             }
@@ -1679,7 +1412,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'trion_chats_v2.json';
+            a.download = 'trion_chats.json';
             a.click();
         };
 
@@ -1687,10 +1420,8 @@
             if (confirm('¿Eliminar todos los chats?')) {
                 chats = { default: [] };
                 currentChatId = 'default';
-                localStorage.removeItem('trion_memory_default');
                 saveChats();
                 loadHistory();
-                updateSidebar();
             }
         };
 
@@ -1698,13 +1429,214 @@
             document.getElementById('chatSidebar').classList.toggle('open');
         };
 
-        window.clearChat = function() {
-            chats[currentChatId] = [];
-            localStorage.removeItem('trion_memory_' + currentChatId);
-            saveChats();
-            loadHistory();
-            updateSidebar();
-        };
+        // Voice setup
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'es-ES';
+
+            recognition.onstart = () => {
+                callButton.classList.add('listening');
+                callButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                showVoiceIndicator('Escuchando...', false);
+            };
+
+            recognition.onend = () => {
+                callButton.classList.remove('listening');
+                if (!isCallActive) callButton.innerHTML = '<i class="fas fa-phone"></i>';
+                if (voiceIndicator && !isSpeaking) {
+                    voiceIndicator.remove();
+                    voiceIndicator = null;
+                }
+                if (isCallActive && autoRestartRecognition && !isSpeaking) {
+                    setTimeout(() => {
+                        if (isCallActive && !isSpeaking && recognition) {
+                            try { recognition.start(); } catch (e) {}
+                        }
+                    }, 300);
+                }
+            };
+
+            recognition.onresult = async (event) => {
+                const transcript = event.results[0][0].transcript;
+                if (transcript && isCallActive) {
+                    userInput.value = transcript;
+                    try { recognition.stop(); } catch (e) {}
+                    await sendMessage(true);
+                }
+            };
+
+            recognition.onerror = (event) => {
+                if (isCallActive && event.error !== 'no-speech') {
+                    stopCall();
+                }
+            };
+        }
+
+        function getBestVoice() {
+            return new Promise((resolve) => {
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    const spanishVoices = voices.filter(v => v.lang.includes('es'));
+                    resolve(spanishVoices[0] || voices[0]);
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+
+        async function speakText(text) {
+            return new Promise(async (resolve) => {
+                if (!window.speechSynthesis) {
+                    resolve();
+                    return;
+                }
+                
+                speechSynthesis.cancel();
+                
+                if (!preferredVoice) {
+                    preferredVoice = await getBestVoice();
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+
+                utterance.onstart = () => {
+                    isSpeaking = true;
+                    callButton.classList.add('active');
+                    callButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    showVoiceIndicator('Hablando...', true);
+                };
+
+                utterance.onend = () => {
+                    isSpeaking = false;
+                    callButton.classList.remove('active');
+                    if (isCallActive) {
+                        callButton.classList.add('listening');
+                        callButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                    }
+                    if (voiceIndicator) {
+                        voiceIndicator.remove();
+                        voiceIndicator = null;
+                    }
+                    resolve();
+                };
+
+                utterance.onerror = () => {
+                    isSpeaking = false;
+                    resolve();
+                };
+
+                speechSynthesis.speak(utterance);
+            });
+        }
+
+        function showVoiceIndicator(text, isSpeakingMode) {
+            if (voiceIndicator) voiceIndicator.remove();
+            voiceIndicator = document.createElement('div');
+            voiceIndicator.className = 'voice-indicator' + (isSpeakingMode ? ' speaking' : '');
+            voiceIndicator.innerHTML = `<i class="fas fa-${isSpeakingMode ? 'volume-up' : 'microphone'}"></i> ${text}`;
+            document.body.appendChild(voiceIndicator);
+        }
+
+        async function startCall() {
+            if (!recognition) {
+                alert('Reconocimiento de voz no soportado');
+                return;
+            }
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                isCallActive = true;
+                autoRestartRecognition = true;
+                callButton.classList.add('active', 'listening');
+                callButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> LLAMADA';
+                setTimeout(() => {
+                    if (isCallActive && recognition) recognition.start();
+                }, 200);
+            } catch (err) {
+                alert('Permiso de micrófono requerido');
+            }
+        }
+
+        function stopCall() {
+            isCallActive = false;
+            autoRestartRecognition = false;
+            if (recognition) recognition.stop();
+            speechSynthesis.cancel();
+            callButton.classList.remove('active', 'listening');
+            callButton.innerHTML = '<i class="fas fa-phone"></i>';
+            if (voiceIndicator) voiceIndicator.remove();
+            updateModeUI();
+        }
+
+        callButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            isCallActive ? stopCall() : startCall();
+        });
+
+        // Cargar voces
+        if (speechSynthesis) {
+            if (speechSynthesis.getVoices().length > 0) {
+                getBestVoice().then(voice => preferredVoice = voice);
+            } else {
+                speechSynthesis.addEventListener('voiceschanged', () => {
+                    getBestVoice().then(voice => preferredVoice = voice);
+                }, { once: true });
+            }
+        }
+
+        function getActiveSystemPrompt() {
+            return PROMPTS[currentMode];
+        }
+
+        function updateModeUI() {
+            document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
+            
+            if (currentMode === 'rapido') {
+                rapidMode.classList.add('active');
+                selectedModeSpan.textContent = 'Rápido';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
+                fileButtons.style.display = 'none';
+                removeFile();
+            } else if (currentMode === 'pro') {
+                proMode.classList.add('active');
+                selectedModeSpan.textContent = 'Pro';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
+                fileButtons.style.display = 'none';
+                removeFile();
+            } else if (currentMode === 'vision') {
+                visionMode.classList.add('active');
+                selectedModeSpan.textContent = 'TRION VISION';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN';
+                fileButtons.style.display = 'flex';
+            } else {
+                normalMode.classList.add('active');
+                selectedModeSpan.textContent = 'Normal';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> NORMAL';
+                fileButtons.style.display = 'none';
+                removeFile();
+            }
+        }
+
+        rapidMode.addEventListener('click', () => { currentMode = 'rapido'; updateModeUI(); });
+        normalMode.addEventListener('click', () => { currentMode = 'normal'; updateModeUI(); });
+        proMode.addEventListener('click', () => { currentMode = 'pro'; updateModeUI(); });
+        visionMode.addEventListener('click', () => { currentMode = 'vision'; updateModeUI(); });
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
 
         function removeFile() {
             currentImageBase64 = null;
@@ -1741,49 +1673,411 @@
             try {
                 currentImageBase64 = await readFileAsBase64(file);
                 currentImageMime = file.type;
-                fileName.textContent = `📷 ${file.name}`;
+                fileName.textContent = `📷 ${file.name} (${formatFileSize(file.size)})`;
                 fileInfo.style.display = 'flex';
+                statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: IMAGEN LISTA';
             } catch (error) {
                 alert('Error al leer la imagen');
                 imageUpload.value = '';
             }
         });
 
-        function updateModeUI() {
-            document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
-            
-            if (currentMode === 'rapido') {
-                rapidMode.classList.add('active');
-                selectedModeSpan.textContent = 'Rápido';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
-                fileButtons.style.display = 'none';
-                removeFile();
-            } else if (currentMode === 'pro') {
-                proMode.classList.add('active');
-                selectedModeSpan.textContent = 'Pro';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
-                fileButtons.style.display = 'none';
-                removeFile();
-            } else if (currentMode === 'vision') {
-                visionMode.classList.add('active');
-                selectedModeSpan.textContent = 'TRION VISION';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN';
-                fileButtons.style.display = 'flex';
+        function loadHistory() {
+            const history = chats[currentChatId] || [];
+            chatBox.innerHTML = '';
+            if (history.length === 0) {
+                showWelcomeMessage();
             } else {
-                normalMode.classList.add('active');
-                selectedModeSpan.textContent = 'Normal';
-                statusDiv.innerHTML = '<i class="fas fa-circle"></i> NORMAL';
-                fileButtons.style.display = 'none';
-                removeFile();
+                history.forEach(msg => {
+                    if (msg.role === 'user') {
+                        if (msg.imageData) {
+                            appendUserMessageWithImage(msg.text, msg.imageData, msg.mime, false);
+                        } else {
+                            appendMessage('user', msg.text, false);
+                        }
+                    } else {
+                        appendMessage('ai', msg.text, false);
+                    }
+                });
             }
         }
 
-        rapidMode.addEventListener('click', () => { currentMode = 'rapido'; updateModeUI(); });
-        normalMode.addEventListener('click', () => { currentMode = 'normal'; updateModeUI(); });
-        proMode.addEventListener('click', () => { currentMode = 'pro'; updateModeUI(); });
-        visionMode.addEventListener('click', () => { currentMode = 'vision'; updateModeUI(); });
+        function showWelcomeMessage() {
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.classList.add('welcome-message');
+            welcomeDiv.innerHTML = `
+                <h3>TRION AI</h3>
+                <p>TRION VISION · HTR</p>
+                <div class="version-badge">v1.8</div>
+                <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
+                    <span><i class="fas fa-bolt"></i> Rápido: Conciso</span>
+                    <span><i class="fas fa-robot"></i> Normal: Equilibrado</span>
+                    <span><i class="fas fa-crown"></i> Pro: Detallado</span>
+                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Imágenes</span>
+                </span>
+            `;
+            chatBox.appendChild(welcomeDiv);
+        }
 
-        sendBtn.addEventListener('click', sendMessage);
+        function saveMessage(role, text, additionalData = {}) {
+            if (!chats[currentChatId]) chats[currentChatId] = [];
+            chats[currentChatId].push({ role, text, ...additionalData });
+            saveChats();
+        }
+
+        function appendMessage(role, text, shouldSave = true) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', role);
+            
+            if (role === 'ai') {
+                const header = document.createElement('div');
+                header.classList.add('message-header');
+                
+                const logoImg = document.createElement('img');
+                logoImg.src = 'logo.png';
+                logoImg.alt = 'TRION';
+                logoImg.onerror = function() {
+                    this.style.display = 'none';
+                    const fallback = document.createElement('i');
+                    fallback.className = 'fas fa-brain';
+                    header.insertBefore(fallback, this);
+                    this.remove();
+                };
+                
+                const span = document.createElement('span');
+                span.textContent = currentMode === 'vision' ? 'TRION VISION' : 'TRION';
+                if (currentMode === 'vision') {
+                    span.style.color = '#10b981';
+                }
+                
+                header.appendChild(logoImg);
+                header.appendChild(span);
+                msgDiv.appendChild(header);
+            }
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = text.replace(/\n/g, '<br>');
+            msgDiv.appendChild(contentDiv);
+            
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            if (shouldSave) saveMessage(role, text);
+        }
+
+        function appendUserMessageWithImage(text, base64Data, mimeType, shouldSave = true) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', 'user');
+            
+            if (text && text.trim()) {
+                const contentDiv = document.createElement('div');
+                contentDiv.textContent = text;
+                msgDiv.appendChild(contentDiv);
+            }
+            
+            const img = document.createElement('img');
+            img.src = `data:${mimeType};base64,${base64Data}`;
+            img.classList.add('message-image-preview');
+            img.alt = 'Imagen adjunta';
+            msgDiv.appendChild(img);
+            
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            if (shouldSave) {
+                saveMessage('user', text, { 
+                    imageData: base64Data, 
+                    mime: mimeType 
+                });
+            }
+        }
+
+        function showThinkingMessage() {
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.classList.add('thinking');
+            thinkingDiv.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div>';
+            chatBox.appendChild(thinkingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return thinkingDiv;
+        }
+
+        window.clearChat = function() {
+            if (isCallActive) stopCall();
+            chats[currentChatId] = [];
+            saveChats();
+            chatBox.innerHTML = '';
+            showWelcomeMessage();
+            removeFile();
+            updateSidebar();
+        };
+
+        // ===== BÚSQUEDA EN INTERNET MEJORADA =====
+        async function searchInternet(query) {
+            const cacheKey = query.toLowerCase().trim();
+            if (searchCache.has(cacheKey)) {
+                return searchCache.get(cacheKey);
+            }
+
+            try {
+                // 1. Intentar Wikipedia primero
+                const term = encodeURIComponent(query.toLowerCase().trim());
+                const wikiResponse = await fetch(`${WIKIPEDIA_API}${term}`);
+                
+                if (wikiResponse.ok) {
+                    const wikiData = await wikiResponse.json();
+                    if (wikiData.extract && wikiData.extract.length > 100) {
+                        const result = {
+                            source: 'Wikipedia',
+                            content: wikiData.extract.substring(0, 2000),
+                            title: wikiData.title,
+                            url: wikiData.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${term}`
+                        };
+                        searchCache.set(cacheKey, result);
+                        return result;
+                    }
+                }
+
+                // 2. Buscar en Wikipedia si no hay resultado directo
+                const searchUrl = SEARCH_WIKI.replace('%s', encodeURIComponent(query));
+                const searchResponse = await fetch(searchUrl);
+                
+                if (searchResponse.ok) {
+                    const searchData = await searchResponse.json();
+                    if (searchData.query?.search?.length > 0) {
+                        const firstTitle = searchData.query.search[0].title;
+                        const pageResponse = await fetch(`${WIKIPEDIA_API}${encodeURIComponent(firstTitle)}`);
+                        
+                        if (pageResponse.ok) {
+                            const pageData = await pageResponse.json();
+                            if (pageData.extract) {
+                                const result = {
+                                    source: 'Wikipedia',
+                                    content: pageData.extract.substring(0, 2000),
+                                    title: pageData.title,
+                                    url: pageData.content_urls?.desktop?.page || `https://es.wikipedia.org/wiki/${encodeURIComponent(firstTitle)}`
+                                };
+                                searchCache.set(cacheKey, result);
+                                return result;
+                            }
+                        }
+                    }
+                }
+
+                // 3. Intentar DuckDuckGo como respaldo
+                const ddgUrl = DUCKDUCKGO_API.replace('%s', encodeURIComponent(query));
+                const ddgResponse = await fetch(ddgUrl);
+                
+                if (ddgResponse.ok) {
+                    const ddgData = await ddgResponse.json();
+                    if (ddgData.AbstractText) {
+                        const result = {
+                            source: 'DuckDuckGo',
+                            content: ddgData.AbstractText.substring(0, 2000),
+                            title: ddgData.Heading || query,
+                            url: ddgData.AbstractURL || ''
+                        };
+                        searchCache.set(cacheKey, result);
+                        return result;
+                    } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
+                        const topic = ddgData.RelatedTopics[0];
+                        const result = {
+                            source: 'DuckDuckGo',
+                            content: topic.Text?.substring(0, 2000) || '',
+                            title: topic.Text?.split(' - ')[0] || query,
+                            url: topic.FirstURL || ''
+                        };
+                        searchCache.set(cacheKey, result);
+                        return result;
+                    }
+                }
+
+                return null;
+            } catch (error) {
+                console.error('Error en búsqueda:', error);
+                return null;
+            }
+        }
+
+        // Función para delay de 3 segundos
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function sendMessage(isVoice = false) {
+            const prompt = userInput.value.trim();
+            
+            const hasImage = !!currentImageBase64;
+
+            // Validaciones específicas para modo visión
+            if (currentMode === 'vision') {
+                if (!hasImage) {
+                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda ayudarte. Estoy en modo TRION VISION y necesito una imagen para trabajar.', true);
+                    userInput.value = '';
+                    return;
+                }
+            }
+
+            if (!prompt && !hasImage) {
+                if (isVoice) {
+                    userInput.value = '';
+                }
+                return;
+            }
+
+            if (document.querySelector('.welcome-message')) {
+                document.querySelector('.welcome-message').remove();
+            }
+
+            // Mostrar mensaje del usuario
+            if (hasImage) {
+                appendUserMessageWithImage(prompt, currentImageBase64, currentImageMime, true);
+            } else {
+                appendMessage('user', prompt, true);
+            }
+
+            // LIMPIAR EL INPUT INMEDIATAMENTE
+            userInput.value = '';
+
+            const imageToSend = currentImageBase64;
+            const mimeToSend = currentImageMime;
+            
+            removeFile();
+
+            const thinkingMsg = showThinkingMessage();
+
+            try {
+                // DELAY DE 3 SEGUNDOS (reducido de 5 a 3)
+                if (currentMode === 'vision') {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO... (3s)';
+                } else {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> BUSCANDO EN INTERNET... (3s)';
+                }
+                await delay(3000); // 3 segundos de espera
+
+                // Buscar información en internet SIEMPRE (excepto en modo visión con imagen)
+                let searchResult = null;
+                if (!hasImage) {
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO RESULTADOS...';
+                    searchResult = await searchInternet(prompt);
+                }
+
+                const history = chats[currentChatId] || [];
+                let systemPrompt = getActiveSystemPrompt();
+                
+                // Añadir resultados de búsqueda al prompt del sistema
+                if (searchResult) {
+                    systemPrompt += `\n\nINFORMACIÓN ACTUALIZADA DE INTERNET (${new Date().toLocaleString('es-ES')}):\n`;
+                    systemPrompt += `Fuente: ${searchResult.source}\n`;
+                    systemPrompt += `Título: ${searchResult.title}\n`;
+                    systemPrompt += `Contenido: ${searchResult.content}\n`;
+                    systemPrompt += `\nUsa ESTA información para responder. Es la información más actualizada disponible.`;
+                }
+
+                let messages = [{ role: "system", content: systemPrompt }];
+                
+                const recentHistory = history.slice(-5);
+                for (let msg of recentHistory) {
+                    if (msg.role === 'user' && !msg.imageData) {
+                        messages.push({ role: "user", content: msg.text });
+                    } else if (msg.role === 'ai') {
+                        messages.push({ role: "assistant", content: msg.text });
+                    }
+                }
+
+                let userContent = [];
+                
+                if (prompt) {
+                    userContent.push({ type: "text", text: prompt });
+                }
+                
+                if (imageToSend) {
+                    userContent.push({ 
+                        type: "image_url", 
+                        image_url: { 
+                            url: `data:${mimeToSend};base64,${imageToSend}` 
+                        } 
+                    });
+                }
+
+                messages.push({ 
+                    role: "user", 
+                    content: userContent.length === 1 ? userContent[0].text : userContent 
+                });
+
+                const temperature = currentMode === 'rapido' ? 0.3 : currentMode === 'pro' ? 0.8 : 0.6;
+                const maxTokens = currentMode === 'pro' ? 4096 : 2048;
+
+                // Usar el mismo modelo para todo
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: MAIN_MODEL,
+                        messages: messages,
+                        max_tokens: maxTokens,
+                        temperature: temperature
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error API:', errorText);
+                    throw new Error(`Error ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                    throw new Error('Respuesta inválida');
+                }
+                
+                let aiResponse = data.choices[0].message.content;
+                aiResponse = aiResponse.replace(/[*]/g, '').trim();
+
+                thinkingMsg.remove();
+                appendMessage('ai', aiResponse, true);
+
+                if (isCallActive) {
+                    autoRestartRecognition = false;
+                    await speakText(aiResponse);
+                    setTimeout(() => {
+                        autoRestartRecognition = true;
+                        if (isCallActive && recognition) {
+                            try { recognition.start(); } catch (e) {}
+                        }
+                    }, 500);
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                thinkingMsg.remove();
+                
+                let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
+                
+                if (currentMode === 'vision') {
+                    errorMessage = '👁️ Error al procesar la imagen. Por favor, intenta de nuevo con otra imagen.';
+                }
+                
+                appendMessage('ai', errorMessage, true);
+                
+                if (isCallActive) {
+                    autoRestartRecognition = false;
+                    await speakText(errorMessage);
+                    setTimeout(() => {
+                        autoRestartRecognition = true;
+                        if (isCallActive && recognition) {
+                            try { recognition.start(); } catch (e) {}
+                        }
+                    }, 500);
+                }
+            } finally {
+                updateModeUI();
+            }
+        }
+
+        sendBtn.addEventListener('click', () => sendMessage());
         userInput.addEventListener('keypress', (e) => { 
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -1792,7 +2086,6 @@
         });
 
         // PWA
-        let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -1831,7 +2124,7 @@
         });
     })();
 </script>
-<script>
+     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js');
