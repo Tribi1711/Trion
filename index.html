@@ -478,7 +478,7 @@
             border: 1px solid var(--border-subtle);
             border-radius: 18px;
             padding: 8px;
-            min-width: 170px;
+            min-width: 200px;
             box-shadow: var(--shadow-xl);
             opacity: 0;
             visibility: hidden;
@@ -1206,17 +1206,17 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="mode-dropdown-content">
-                        <div class="mode-option active" data-mode="rapido" id="rapidoMode">
+                        <div class="mode-option" data-mode="rapido" id="rapidoMode">
                             <i class="fas fa-bolt"></i> Rápido
                         </div>
-                        <div class="mode-option" data-mode="normal" id="normalMode">
+                        <div class="mode-option active" data-mode="normal" id="normalMode">
                             <i class="fas fa-robot"></i> Normal
                         </div>
                         <div class="mode-option" data-mode="pro" id="proMode">
                             <i class="fas fa-crown"></i> Pro
                         </div>
                         <div class="mode-option vision-mode" data-mode="vision" id="visionMode">
-                            <i class="fas fa-eye"></i> TRION VISION
+                            <i class="fas fa-eye"></i> VISIÓN (llama-4)
                         </div>
                     </div>
                 </div>
@@ -1231,7 +1231,7 @@
 
         <div class="input-area">
             <div class="file-buttons">
-                <label class="attach-btn" id="vision-attach-btn" style="border-color: #10b981;">
+                <label class="attach-btn" id="vision-attach-btn">
                     <i class="fas fa-camera"></i>
                     <input type="file" id="imageUpload" accept="image/*">
                 </label>
@@ -1276,13 +1276,15 @@
             document.getElementById('splashScreen').classList.add('fade-out');
         }, 2000);
 
-        // ===== CONFIGURACIÓN =====
+        // ===== CONFIGURACIÓN CON EL MODELO QUE PIDES =====
         const API_KEY = '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';
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         
-        // MODELOS
-        const VISION_MODEL = 'llama-3.2-11b-vision-preview';  // Modelo con visión
-        const TEXT_MODEL = 'llama-3.3-70b-versatile';         // Modelo de texto
+        // MODELO DE VISIÓN (el que me pediste)
+        const VISION_MODEL = 'meta-llama/llama-4-maverick-17b-128e-instruct';
+        
+        // MODELO DE TEXTO
+        const TEXT_MODEL = 'llama-3.3-70b-versatile';
 
         // System prompts
         const PROMPTS = {
@@ -1605,38 +1607,31 @@
         }
 
         function getActiveModel() {
-            // Si estamos en modo visión, usar modelo de visión
             if (currentMode === 'vision') {
-                return VISION_MODEL;
+                return VISION_MODEL; // meta-llama/llama-4-maverick-17b-128e-instruct
             }
-            // Para otros modos, usar modelo de texto
             return TEXT_MODEL;
         }
 
         function updateModeUI() {
             document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('active'));
             
-            // Remover clase vision-mode de todos
-            document.querySelectorAll('.mode-option').forEach(opt => {
-                opt.classList.remove('vision-mode');
-            });
-            
             if (currentMode === 'rapido') {
                 rapidMode.classList.add('active');
                 selectedModeSpan.textContent = 'Rápido';
                 if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> RÁPIDO';
-                // Cambiar color del botón de imagen
                 document.getElementById('vision-attach-btn').style.borderColor = 'var(--border-subtle)';
+                document.getElementById('vision-attach-btn').style.boxShadow = 'none';
             } else if (currentMode === 'pro') {
                 proMode.classList.add('active');
                 selectedModeSpan.textContent = 'Pro';
                 if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> PRO';
                 document.getElementById('vision-attach-btn').style.borderColor = 'var(--border-subtle)';
+                document.getElementById('vision-attach-btn').style.boxShadow = 'none';
             } else if (currentMode === 'vision') {
-                visionMode.classList.add('active', 'vision-mode');
-                selectedModeSpan.textContent = 'TRION VISION';
-                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN';
-                // Resaltar botón de imagen en verde
+                visionMode.classList.add('active');
+                selectedModeSpan.textContent = 'VISIÓN';
+                if (!isCallActive) statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN (llama-4)';
                 document.getElementById('vision-attach-btn').style.borderColor = '#10b981';
                 document.getElementById('vision-attach-btn').style.boxShadow = '0 0 15px #10b981';
             } else {
@@ -1771,12 +1766,12 @@
             welcomeDiv.classList.add('welcome-message');
             welcomeDiv.innerHTML = `
                 <h3>TRION AI · ${new Date().toLocaleDateString('es-ES')}</h3>
-                <p>Selecciona <span style="color:#10b981; font-weight:bold;">TRION VISION</span> para analizar imágenes</p>
+                <p>Selecciona <span style="color:#10b981; font-weight:bold;">VISIÓN (llama-4)</span> para analizar imágenes</p>
                 <span style="color: var(--accent-secondary); font-size: 0.8rem; display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
                     <span><i class="fas fa-bolt"></i> Rápido: Texto conciso</span>
                     <span><i class="fas fa-robot"></i> Normal: Texto equilibrado</span>
                     <span><i class="fas fa-crown"></i> Pro: Texto detallado</span>
-                    <span><i class="fas fa-eye" style="color:#10b981;"></i> TRION VISION: Análisis de imágenes</span>
+                    <span><i class="fas fa-eye" style="color:#10b981;"></i> VISIÓN: Análisis con llama-4</span>
                 </span>
             `;
             chatBox.appendChild(welcomeDiv);
@@ -1808,7 +1803,7 @@
                 };
                 
                 const span = document.createElement('span');
-                span.textContent = currentMode === 'vision' ? 'TRION VISION' : 'TRION';
+                span.textContent = currentMode === 'vision' ? 'TRION VISIÓN' : 'TRION';
                 if (currentMode === 'vision') {
                     span.style.color = '#10b981';
                 }
@@ -1966,7 +1961,7 @@
             // Validaciones específicas para modo visión
             if (currentMode === 'vision') {
                 if (!hasImage) {
-                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda analizarla. Estoy en modo TRION VISION y necesito una imagen para ayudarte.', true);
+                    appendMessage('ai', '👁️ Por favor, sube una imagen para que pueda analizarla con llama-4. Estoy en modo VISIÓN y necesito una imagen para ayudarte.', true);
                     userInput.value = '';
                     return;
                 }
@@ -2007,7 +2002,7 @@
             try {
                 // DELAY DE 5 SEGUNDOS PARA MEJOR PROCESAMIENTO
                 if (currentMode === 'vision') {
-                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO... (5s)';
+                    statusDiv.innerHTML = '<i class="fas fa-circle"></i> VISIÓN: ANALIZANDO CON LLAMA-4... (5s)';
                 } else {
                     statusDiv.innerHTML = '<i class="fas fa-circle"></i> PROCESANDO... (5s)';
                 }
@@ -2044,13 +2039,13 @@
                     userContent.push({ type: "text", text: prompt });
                 }
                 
-                // Si hay imagen, enviarla con instrucciones específicas según el modo
+                // Si hay imagen, enviarla
                 if (imageToSend) {
                     if (currentMode === 'vision') {
-                        // En modo visión, instrucciones detalladas para análisis de imagen
+                        // En modo visión, instrucciones específicas
                         userContent.push({ 
                             type: "text", 
-                            text: "Analiza esta imagen en detalle. Describe todos los elementos que ves: objetos, personas, texto, colores, composición, contexto. Sé exhaustivo en tu análisis." 
+                            text: "Analiza esta imagen en detalle con llama-4. Describe todos los elementos que ves: objetos, personas, texto, colores, composición, contexto. Sé exhaustivo en tu análisis." 
                         });
                     }
                     
@@ -2082,6 +2077,7 @@
 
                 console.log('Usando modelo:', modelToUse);
                 console.log('Modo actual:', currentMode);
+                console.log('Tiene imagen:', hasImage);
 
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -2132,9 +2128,8 @@
                 
                 let errorMessage = 'Lo siento, hubo un error. Intenta de nuevo.';
                 
-                // Fallback específico para modo visión
                 if (currentMode === 'vision') {
-                    errorMessage = '👁️ Error al analizar la imagen. Por favor, intenta de nuevo con otra imagen.';
+                    errorMessage = '👁️ Error al analizar la imagen con llama-4. Por favor, intenta de nuevo con otra imagen.';
                 }
                 
                 appendMessage('ai', errorMessage, true);
