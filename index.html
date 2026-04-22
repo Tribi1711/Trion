@@ -889,7 +889,7 @@
     continuousRec.onresult = (event) => {
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript.toLowerCase();
-        if (transcript.includes('hola tribi') || transcript.includes('tribi hola') || transcript.includes('tribi')) {
+        if (transcript.includes('hola trivi') || transcript.includes('trivi hola') || transcript.includes('trivi')) {
           if (!document.getElementById('assistant').classList.contains('active')) {
             toggleAssistant();
           }
